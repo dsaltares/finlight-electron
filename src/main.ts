@@ -7,7 +7,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = async () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -19,9 +19,11 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    await mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    await mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
   }
 
   // Open the DevTools.
@@ -30,7 +32,7 @@ const createWindow = () => {
 
 const onReady = async () => {
   await migrateToLatest();
-  createWindow();
+  await createWindow();
 };
 
 // This method will be called when Electron has finished
@@ -47,11 +49,11 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('activate', () => {
+app.on('activate', async () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    await createWindow();
   }
 });
 

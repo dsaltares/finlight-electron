@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 export {}; // Make this a module
 
 declare global {
@@ -14,7 +15,9 @@ declare global {
     }
   }
 
-  type VitePluginConfig = ConstructorParameters<typeof import('@electron-forge/plugin-vite').VitePlugin>[0];
+  type VitePluginConfig = ConstructorParameters<
+    typeof import('@electron-forge/plugin-vite').VitePlugin
+  >[0];
 
   interface VitePluginRuntimeKeys {
     VITE_DEV_SERVER_URL: `${string}_VITE_DEV_SERVER_URL`;
@@ -23,7 +26,9 @@ declare global {
 }
 
 declare module 'vite' {
-  interface ConfigEnv<K extends keyof VitePluginConfig = keyof VitePluginConfig> {
+  interface ConfigEnv<
+    K extends keyof VitePluginConfig = keyof VitePluginConfig,
+  > {
     root: string;
     forgeConfig: VitePluginConfig;
     forgeConfigSelf: VitePluginConfig[K][number];
