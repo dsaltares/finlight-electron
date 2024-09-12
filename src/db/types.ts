@@ -4,26 +4,124 @@ import type {
   Selectable,
   Updateable,
   Insertable,
+  JSONColumnType,
 } from 'kysely';
 
 export interface Database {
   exchangeRate: ExchangeRateTable;
+  csvImportPreset: CSVImportPresetTable;
+  bankAccount: BankAccountTable;
+  category: CategoryTable;
+  accountTransaction: AccountTransactionTable;
+  budget: BugetTable;
+  budgetEntry: BudgetEntryTable;
 }
 
 export interface ExchangeRateTable {
-  id: Generated<string>;
+  id: Generated<number>;
   ticker: string;
   open: number;
   low: number;
   high: number;
   close: number;
-  date: Date;
+  date: Timestamp;
   createdAt: Generated<Timestamp>;
   updatedAt: Generated<Timestamp>;
 }
-
 export type ExchangeRate = Selectable<ExchangeRateTable>;
 export type NewExchangeRate = Insertable<ExchangeRateTable>;
 export type ExchangeRateUpdate = Updateable<ExchangeRateTable>;
 
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+export type CSVImportField =
+  | 'Date'
+  | 'Amount'
+  | 'Withdrawal'
+  | 'Deposit'
+  | 'Fee'
+  | 'Description'
+  | 'Ignore';
+export interface CSVImportPresetTable {
+  id: Generated<number>;
+  name: string;
+  fields: JSONColumnType<CSVImportField[]>;
+  dateFormat: string;
+  delimiter: string;
+  rowsToSkipStart: number;
+  rowsToSkipEnd: number;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+}
+export type CSVImportPreset = Selectable<CSVImportPresetTable>;
+export type NewCSVImportPreset = Insertable<CSVImportPresetTable>;
+export type CSVImportPresetUpdate = Updateable<CSVImportPresetTable>;
+
+export type BankAccountTable = {
+  id: Generated<number>;
+  name: string;
+  initialBalance: number;
+  currency: string;
+  csvImportPresetId: number | null;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+};
+export type BankAccount = Selectable<BankAccountTable>;
+export type NewBankAccount = Insertable<BankAccountTable>;
+export type BankAccountUpdate = Updateable<BankAccountTable>;
+
+export interface CategoryTable {
+  id: Generated<number>;
+  name: string;
+  importPatterns: JSONColumnType<string[]>;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  deletedAt: Timestamp | null;
+}
+export type Category = Selectable<CategoryTable>;
+export type NewCategory = Insertable<CategoryTable>;
+export type CategoryUpdate = Updateable<CategoryTable>;
+
+type TransactionType = 'Income' | 'Expense' | 'Transfer';
+export interface AccountTransactionTable {
+  id: Generated<number>;
+  accountId: number;
+  date: Timestamp;
+  amount: number;
+  description: string;
+  type: TransactionType;
+  categoryId: number | null;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+}
+export type AccountTransaction = Selectable<AccountTransactionTable>;
+export type NewTransaction = Insertable<AccountTransactionTable>;
+export type TransactionUpdate = Updateable<AccountTransactionTable>;
+
+export type BudgetGranularity = 'Monthly' | 'Quarterly' | 'Yearly';
+export interface BugetTable {
+  id: Generated<number>;
+  granularity: BudgetGranularity;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+export type Budget = Selectable<BugetTable>;
+export type NewBudget = Insertable<BugetTable>;
+export type BudgetUpdate = Updateable<BugetTable>;
+
+export type BudgetEntryType = 'Income' | 'Expense';
+export interface BudgetEntryTable {
+  id: Generated<number>;
+  type: BudgetEntryType;
+  budgetId: number;
+  categoryId: number;
+  target: number;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+export type BudgetEntry = Selectable<BudgetEntryTable>;
+export type NewBudgetEntry = Insertable<BudgetEntryTable>;
+export type BudgetEntryUpdate = Updateable<BudgetEntryTable>;
+
+export type Timestamp = ColumnType<Date, string | undefined, never>;
