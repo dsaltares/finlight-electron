@@ -5,6 +5,7 @@
   "description": "Personal finance app",
   "main": ".vite/build/main.js",
   "scripts": {
+    "postinstall": "./node_modules/.bin/electron-rebuild",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -24,6 +25,7 @@
     "@electron-forge/plugin-vite": "^7.4.0",
     "@electron/fuses": "^1.8.0",
     "@types/better-sqlite3": "^7.6.11",
+    "@types/debug": "^4.1.12",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -32,6 +34,7 @@
     "electron": "32.0.2",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-import": "^2.25.0",
     "prettier": "^3.3.3",
     "ts-node": "^10.0.0",
@@ -46,10 +49,26 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/roboto-mono": "^5.1.0",
+    "@mui/icons-material": "^6.1.0",
+    "@mui/lab": "^6.0.0-beta.9",
+    "@mui/material": "^6.1.0",
+    "@mui/x-date-pickers": "^7.16.0",
+    "@tanstack/react-query": "^5.56.2",
+    "@tanstack/react-query-devtools": "^5.56.2",
+    "@trpc/client": "^11.0.0-rc.502",
+    "@trpc/react-query": "^11.0.0-rc.502",
+    "@trpc/server": "^11.0.0-rc.502",
     "better-sqlite3": "^11.3.0",
+    "date-fns": "^3.6.0",
+    "debug": "^4.3.7",
     "electron-squirrel-startup": "^1.0.1",
     "kysely": "^0.27.3",
+    "notistack": "^3.0.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
   }
 }

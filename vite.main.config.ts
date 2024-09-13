@@ -5,6 +5,7 @@ import {
   getBuildDefine,
   external,
   pluginHotRestart,
+  tsconfigPathAliases,
 } from './vite.base.config';
 
 // https://vitejs.dev/config
@@ -28,6 +29,7 @@ export default defineConfig((env) => {
     resolve: {
       // Load the Node.js entry.
       mainFields: ['module', 'jsnext:main', 'jsnext'],
+      alias: tsconfigPathAliases,
     },
   };
 

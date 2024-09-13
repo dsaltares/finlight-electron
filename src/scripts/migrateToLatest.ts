@@ -1,4 +1,4 @@
-import { migrateToLatest } from '@db/migrations';
+import { migrateToLatest } from '@server/db/migrations';
 
 void main();
 

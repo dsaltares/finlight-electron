@@ -1,6 +1,8 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
-import { migrateToLatest } from './db/migrations';
+import { migrateToLatest } from '@server/db/migrations';
+import router from '@server/router';
+import { createIPCHandler } from '@lib/electron-trpc/main';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -14,6 +16,7 @@ const createWindow = async () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
     },
   });
 
@@ -28,11 +31,13 @@ const createWindow = async () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+  return mainWindow;
 };
 
 const onReady = async () => {
   await migrateToLatest();
-  await createWindow();
+  const window = await createWindow();
+  createIPCHandler({ router, windows: [window] });
 };
 
 // This method will be called when Electron has finished

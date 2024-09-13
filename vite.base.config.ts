@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { builtinModules } from 'node:module';
 import type { AddressInfo } from 'node:net';
+import path from 'path';
 import type { ConfigEnv, Plugin, UserConfig } from 'vite';
 import pkg from './package.json';
+import tsconfig from './tsconfig.json';
 
 export const builtins = [
   'electron',
@@ -15,6 +17,25 @@ export const external = [
     'dependencies' in pkg ? (pkg.dependencies as Record<string, unknown>) : {},
   ),
 ];
+
+export const tsconfigPathAliases = Object.fromEntries(
+  Object.entries(tsconfig.compilerOptions.paths).map(([key, values]) => {
+    let value = values[0];
+    if (key.endsWith('/*')) {
+      key = key.slice(0, -2);
+      value = value.slice(0, -2);
+    }
+
+    const nodeModulesPrefix = 'node_modules/';
+    if (value.startsWith(nodeModulesPrefix)) {
+      value = value.replace(nodeModulesPrefix, '');
+    } else {
+      value = path.join(__dirname, value);
+    }
+
+    return [key, value];
+  }),
+);
 
 export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
   const { root, mode, command } = env;
