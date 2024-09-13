@@ -1,5 +1,4 @@
 import type {
-  ColumnType,
   Generated,
   Selectable,
   Updateable,
@@ -24,9 +23,9 @@ export interface ExchangeRateTable {
   low: number;
   high: number;
   close: number;
-  date: Timestamp;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
+  date: string;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
 }
 export type ExchangeRate = Selectable<ExchangeRateTable>;
 export type NewExchangeRate = Insertable<ExchangeRateTable>;
@@ -46,11 +45,12 @@ export interface CSVImportPresetTable {
   fields: JSONColumnType<CSVImportField[]>;
   dateFormat: string;
   delimiter: string;
+  decimal: string;
   rowsToSkipStart: number;
   rowsToSkipEnd: number;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
-  deletedAt: Timestamp | null;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+  deletedAt: string | null;
 }
 export type CSVImportPreset = Selectable<CSVImportPresetTable>;
 export type NewCSVImportPreset = Insertable<CSVImportPresetTable>;
@@ -60,11 +60,12 @@ export type BankAccountTable = {
   id: Generated<number>;
   name: string;
   initialBalance: number;
+  balance: number;
   currency: string;
   csvImportPresetId: number | null;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
-  deletedAt: Timestamp | null;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+  deletedAt: string | null;
 };
 export type BankAccount = Selectable<BankAccountTable>;
 export type NewBankAccount = Insertable<BankAccountTable>;
@@ -74,9 +75,9 @@ export interface CategoryTable {
   id: Generated<number>;
   name: string;
   importPatterns: JSONColumnType<string[]>;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  deletedAt: Timestamp | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 export type Category = Selectable<CategoryTable>;
 export type NewCategory = Insertable<CategoryTable>;
@@ -86,14 +87,14 @@ type TransactionType = 'Income' | 'Expense' | 'Transfer';
 export interface AccountTransactionTable {
   id: Generated<number>;
   accountId: number;
-  date: Timestamp;
+  date: string;
   amount: number;
   description: string;
   type: TransactionType;
   categoryId: number | null;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
-  deletedAt: Timestamp | null;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+  deletedAt: string | null;
 }
 export type AccountTransaction = Selectable<AccountTransactionTable>;
 export type NewTransaction = Insertable<AccountTransactionTable>;
@@ -103,8 +104,8 @@ export type BudgetGranularity = 'Monthly' | 'Quarterly' | 'Yearly';
 export interface BugetTable {
   id: Generated<number>;
   granularity: BudgetGranularity;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
 }
 export type Budget = Selectable<BugetTable>;
 export type NewBudget = Insertable<BugetTable>;
@@ -117,11 +118,9 @@ export interface BudgetEntryTable {
   budgetId: number;
   categoryId: number;
   target: number;
-  createdAt: Generated<Timestamp>;
-  updatedAt: Generated<Timestamp>;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
 }
 export type BudgetEntry = Selectable<BudgetEntryTable>;
 export type NewBudgetEntry = Insertable<BudgetEntryTable>;
 export type BudgetEntryUpdate = Updateable<BudgetEntryTable>;
-
-export type Timestamp = ColumnType<Date, string | undefined, never>;

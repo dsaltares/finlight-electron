@@ -38,6 +38,7 @@ const createTables: Migration = {
       .addColumn('fields', 'jsonb', (col) => col.notNull())
       .addColumn('dateFormat', 'text', (col) => col.notNull())
       .addColumn('delimiter', 'text', (col) => col.notNull())
+      .addColumn('decimal', 'text', (col) => col.notNull())
       .addColumn('rowsToSkipStart', 'integer', (col) =>
         col.notNull().defaultTo(0),
       )
@@ -65,6 +66,7 @@ const createTables: Migration = {
       .addColumn('id', 'integer', (col) => col.primaryKey())
       .addColumn('name', 'text', (col) => col.notNull())
       .addColumn('initialBalance', 'real', (col) => col.notNull().defaultTo(0))
+      .addColumn('balance', 'real', (col) => col.notNull().defaultTo(0))
       .addColumn('currency', 'text', (col) => col.notNull().defaultTo('EUR'))
       .addColumn('csvImportPresetId', 'integer')
       .addColumn('createdAt', 'text', (col) =>

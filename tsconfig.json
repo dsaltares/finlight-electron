@@ -19,7 +19,7 @@
       "@lib/*": ["./src/lib/*"],
       "@server/*": ["./src/server/*"],
       "@components/*": ["./src/components/*"],
-      "@app/*": ["./src/app/*"],
+      "@routes/*": ["./src/routes/*"],
       "@styles/*": ["./src/styles/*"]
     }
   }
