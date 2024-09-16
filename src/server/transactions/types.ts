@@ -5,13 +5,13 @@ export const TransactionTypes = ['Income', 'Expense', 'Transfer'] as const;
 export const TransactionType = z.enum(TransactionTypes);
 
 export const Transaction = z.object({
-  id: z.string(),
+  id: z.number(),
   amount: z.number(),
   date: Date,
   description: z.string(),
   type: TransactionType,
-  categoryId: z.string().nullable(),
-  accountId: z.string(),
+  categoryId: z.number().nullable(),
+  accountId: z.number(),
   createdAt: Date,
   updatedAt: Date,
 });
@@ -20,9 +20,9 @@ export const GetTransactionsInput = z.object({
   date: DateFilter.optional(),
   minAmount: z.number().optional(),
   maxAmount: z.number().optional(),
-  accountId: z.string().optional(),
+  accountId: z.number().optional(),
   type: TransactionType.optional(),
-  categoryId: z.string().optional(),
+  categoryId: z.number().optional(),
   description: z.string().optional(),
 });
 export const GetTransactionsOutput = z.array(Transaction);
@@ -36,7 +36,7 @@ export const CreateTransactionInput = Transaction.pick({
 });
 export const CreateTransactionOutput = Transaction;
 export const CreateTransactionsInput = z.object({
-  accountId: z.string(),
+  accountId: z.number(),
   transactions: Transaction.pick({
     amount: true,
     date: true,
@@ -46,25 +46,25 @@ export const CreateTransactionsInput = z.object({
 });
 export const CreateTransactionsOutput = z.number();
 export const UpdateTransactionInput = z.object({
-  id: z.string(),
+  id: z.number(),
   amount: z.number().optional(),
   date: Date.optional(),
   description: z.string().optional(),
   type: TransactionType.optional(),
-  categoryId: z.string().nullable().optional(),
+  categoryId: z.number().nullable().optional(),
 });
 export const UpdateTransactionOutput = Transaction;
 export const UpdateTransactionsInput = z.object({
-  ids: z.string().array(),
+  ids: z.number().array(),
   amount: z.number().optional(),
   date: Date.optional(),
   description: z.string().optional(),
   type: TransactionType.optional(),
-  categoryId: z.string().nullable().optional(),
+  categoryId: z.number().nullable().optional(),
 });
 export const UpdateTransactionsOutput = z.void();
 export const DeleteTransactionsInput = z.object({
-  ids: z.string().array(),
+  ids: z.number().array(),
 });
 export const DeleteTransactionsOutput = z.void();
 

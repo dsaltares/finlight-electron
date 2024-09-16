@@ -1,24 +1,11 @@
-import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useState } from 'react';
 
-const useDialogForId = (queryParam: string) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const openFor = searchParams.get(queryParam);
-  const onOpen = useCallback(
-    (id: number) => {
-      setSearchParams((prev) => ({ ...prev, [queryParam]: id }));
-    },
-    [queryParam, setSearchParams],
-  );
-  const onClose = useCallback(() => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.delete(queryParam);
-      return newParams;
-    });
-  }, [queryParam, setSearchParams]);
+const useDialogForId = () => {
+  const [openFor, setOpenFor] = useState<number | null>(null);
+  const onOpen = useCallback((id: number) => setOpenFor(id), [setOpenFor]);
+  const onClose = useCallback(() => setOpenFor(null), [setOpenFor]);
   return {
-    openFor: openFor ? parseInt(openFor, 10) : null,
+    openFor,
     open: !!openFor,
     onOpen,
     onClose,

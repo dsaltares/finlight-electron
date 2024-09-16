@@ -20,7 +20,7 @@ export default function AccountsPage() {
     open: isCreateDialogOpen,
     onOpen: onCreateDialogOpen,
     onClose: onCreateDialogClose,
-  } = useDialog('createAccount');
+  } = useDialog();
   const { mutateAsync: createAccount, isPending: isCreating } =
     client.createAccount.useMutation();
 

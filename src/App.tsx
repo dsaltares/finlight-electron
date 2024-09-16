@@ -3,7 +3,6 @@ import '@fontsource/roboto-mono/400.css';
 import '@fontsource/roboto-mono/500.css';
 import '@fontsource/roboto-mono/700.css';
 import '@styles/global.css';
-import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
@@ -16,6 +15,7 @@ import Root from '@routes/root';
 import ErrorPage from '@routes/error';
 import IndexPage from '@routes/index';
 import AccountsPage from '@routes/accounts';
+import TransactionsPage from '@routes/transactions';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +25,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <IndexPage /> },
       { path: 'accounts', element: <AccountsPage /> },
+      { path: 'transactions', element: <TransactionsPage /> },
     ],
   },
 ]);

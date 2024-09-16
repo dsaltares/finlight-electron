@@ -5,6 +5,13 @@ import getCSVImportPresets from './csvImportPreset/getCSVImportPresets';
 import createAccount from './accounts/createAccount';
 import updateAccount from './accounts/updateAccount';
 import deleteAccount from './accounts/deleteAccount';
+import getCategories from './category/getCategories';
+import getTransactions from './transactions/getTransactions';
+import createTransaction from './transactions/createTransaction';
+import createTransactions from './transactions/createTransactions';
+import updateTransaction from './transactions/updateTransaction';
+import updateTransactions from './transactions/updateTransactions';
+import deleteTransactions from './transactions/deleteTransactions';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -16,6 +23,13 @@ const router = trpc.router({
   updateAccount,
   deleteAccount,
   getCSVImportPresets,
+  getCategories,
+  getTransactions,
+  createTransaction,
+  createTransactions,
+  updateTransaction,
+  updateTransactions,
+  deleteTransactions,
 });
 
 export default router;

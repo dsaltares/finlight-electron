@@ -21,7 +21,7 @@ export default function AccountList({ accounts, presets }: Props) {
     open: deleteOpen,
     onOpen: onDeleteOpen,
     onClose: onDeleteClose,
-  } = useDialogForId('deleteAccount');
+  } = useDialogForId();
   const { mutateAsync: deleteAccount, isPending: isDeleting } =
     client.deleteAccount.useMutation();
   const handleDelete = () =>
@@ -32,7 +32,7 @@ export default function AccountList({ accounts, presets }: Props) {
     open: isUpdateDialogOpen,
     onOpen: onUpdateDialogOpen,
     onClose: onUpdateDialogClose,
-  } = useDialogForId('updateAccount');
+  } = useDialogForId();
   const account = useMemo(
     () => accounts.find((account) => account.id === accountId),
     [accounts, accountId],
