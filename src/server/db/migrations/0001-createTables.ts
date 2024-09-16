@@ -18,10 +18,7 @@ const createTables: Migration = {
       .addColumn('updatedAt', 'text', (col) =>
         col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
       )
-      .addUniqueConstraint('unique_exchangeRate_ticker_date', [
-        'ticker',
-        'date',
-      ])
+      .addUniqueConstraint('unique_exchangeRate_ticker', ['ticker'])
       .execute();
 
     await sql`
@@ -217,6 +214,28 @@ const createTables: Migration = {
         update budgetEntry SET updatedAt = CURRENT_TIMESTAMP WHERE id = NEW.id;
       END;
       `.execute(db);
+
+    await db.schema
+      .createTable('keyValue')
+      .addColumn('id', 'integer', (col) => col.primaryKey())
+      .addColumn('key', 'text', (col) => col.notNull())
+      .addColumn('value', 'text', (col) => col.notNull())
+      .addColumn('createdAt', 'text', (col) =>
+        col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
+      )
+      .addColumn('updatedAt', 'text', (col) =>
+        col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`),
+      )
+      .addColumn('deletedAt', 'text')
+      .addUniqueConstraint('unique_keyValue_key', ['key'])
+      .execute();
+
+    await sql`
+      CREATE TRIGGER keyValue_updatedAt_trigger AFTER UPDATE ON keyValue
+      BEGIN
+        update keyValue SET updatedAt = CURRENT_TIMESTAMP WHERE id = NEW.id;
+      END;
+      `.execute(db);
   },
   down: async function (db) {
     await db.schema.dropTable('exchangeRate').execute();
@@ -226,6 +245,7 @@ const createTables: Migration = {
     await db.schema.dropTable('category').execute();
     await db.schema.dropTable('budgetEntry').execute();
     await db.schema.dropTable('budget').execute();
+    await db.schema.dropTable('keyValue').execute();
   },
 };
 

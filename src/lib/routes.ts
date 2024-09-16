@@ -12,6 +12,7 @@ const Routes = {
   budget: '/budget',
   categories: '/categories',
   importPresets: '/importPresets',
+  exchangeRates: '/exchangeRates',
 };
 
 export default Routes;

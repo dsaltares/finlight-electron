@@ -25,6 +25,11 @@ import getCategoryReport from './reports/getCategoryReport';
 import getIncomeVsExpensesReport from './reports/getIncomeVsExpensesReport';
 import updateBudget from './budget/updateBudget';
 import getBudget from './budget/getBudget';
+import getExchangeRates from './exchangeRates/getExchangeRates';
+import upsertExchangeRate from './exchangeRates/upsertExchangeRate';
+import refreshExchangeRates from './exchangeRates/refreshExchangeRates';
+import getValue from './keyValue/getValue';
+import updateValue from './keyValue/updateValue';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -56,6 +61,11 @@ const router = trpc.router({
   getIncomeVsExpensesReport,
   getBudget,
   updateBudget,
+  getExchangeRates,
+  upsertExchangeRate,
+  refreshExchangeRates,
+  getValue,
+  updateValue,
 });
 
 export default router;

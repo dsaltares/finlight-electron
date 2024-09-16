@@ -20,6 +20,7 @@ import CategoriesPage from '@routes/CategoriesPage';
 import ImportPresetsPage from '@routes/ImportPresetsPage';
 import InsightsPage from '@routes/InsightsPage';
 import BudgetPage from '@routes/BudgetPage';
+import ExchangeRatesPage from '@routes/ExchangeRatesPage';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ const router = createBrowserRouter([
       { path: 'importPresets', element: <ImportPresetsPage /> },
       { path: 'insights', element: <InsightsPage /> },
       { path: 'budget', element: <BudgetPage /> },
+      { path: 'exchangeRates', element: <ExchangeRatesPage /> },
     ],
   },
 ]);

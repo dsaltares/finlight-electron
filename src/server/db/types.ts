@@ -14,6 +14,7 @@ export interface Database {
   accountTransaction: AccountTransactionTable;
   budget: BugetTable;
   budgetEntry: BudgetEntryTable;
+  keyValue: KeyValueTable;
 }
 
 export interface ExchangeRateTable {
@@ -124,3 +125,16 @@ export interface BudgetEntryTable {
 export type BudgetEntry = Selectable<BudgetEntryTable>;
 export type NewBudgetEntry = Insertable<BudgetEntryTable>;
 export type BudgetEntryUpdate = Updateable<BudgetEntryTable>;
+
+export interface KeyValueTable {
+  id: Generated<number>;
+  key: string;
+  value: string;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+  deletedAt: string | null;
+}
+
+export type KeyValue = Selectable<KeyValueTable>;
+export type NewKeyValue = Insertable<KeyValueTable>;
+export type KeyValueUpdate = Updateable<KeyValueTable>;

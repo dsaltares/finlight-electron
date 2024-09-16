@@ -20,6 +20,7 @@ const RouteTitles: Record<string, string> = {
   '/insights': 'Insights',
   '/importPresets': 'Import Presets',
   '/budget': 'Budget',
+  '/exchangeRates': 'Exchange Rates',
 };
 
 export default function HeaderBar({ onOpenSidebar }: Props) {
