@@ -16,6 +16,7 @@ import ErrorPage from '@routes/error';
 import IndexPage from '@routes/index';
 import AccountsPage from '@routes/accounts';
 import TransactionsPage from '@routes/transactions';
+import CategoriesPage from '@routes/categories';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { index: true, element: <IndexPage /> },
       { path: 'accounts', element: <AccountsPage /> },
       { path: 'transactions', element: <TransactionsPage /> },
+      { path: 'categories', element: <CategoriesPage /> },
     ],
   },
 ]);

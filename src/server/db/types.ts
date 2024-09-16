@@ -74,9 +74,9 @@ export type BankAccountUpdate = Updateable<BankAccountTable>;
 export interface CategoryTable {
   id: Generated<number>;
   name: string;
-  importPatterns: JSONColumnType<string[]>;
-  createdAt: string;
-  updatedAt: string;
+  importPatterns: JSONColumnType<Array<string>>;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
   deletedAt: string | null;
 }
 export type Category = Selectable<CategoryTable>;

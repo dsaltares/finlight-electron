@@ -1,5 +1,5 @@
 import SQLite from 'better-sqlite3';
-import { Kysely, SqliteDialect } from 'kysely';
+import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
 import type { Database } from './types';
 
 export default function createDb() {
@@ -7,6 +7,7 @@ export default function createDb() {
     dialect: new SqliteDialect({
       database: new SQLite('./db.sqlite'),
     }),
+    plugins: [new ParseJSONResultsPlugin()],
     log(event) {
       if (event.level === 'error') {
         console.error(
