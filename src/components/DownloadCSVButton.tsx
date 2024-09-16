@@ -1,6 +1,6 @@
 import IconButton from '@mui/material/IconButton';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { stringify } from 'csv-stringify/sync';
+import { stringify } from 'csv-stringify/browser/esm/sync';
 
 type Props<T> = {
   fileName: string;
