@@ -18,6 +18,11 @@ import deleteCategory from './category/deleteCategory';
 import createCSVImportPreset from './csvImportPreset/createCSVImportPreset';
 import updateCSVImportPreset from './csvImportPreset/updateCSVImportPreset';
 import deleteCSVImportPreset from './csvImportPreset/deleteCSVImportPreset';
+import getAccountBalancesReport from './reports/getAccountBalancesReport';
+import getBalanceForecastReport from './reports/getBalanceForecastReport';
+import getBucketedCategoryReport from './reports/getBucketedCategoryReport';
+import getCategoryReport from './reports/getCategoryReport';
+import getIncomeVsExpensesReport from './reports/getIncomeVsExpensesReport';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -42,6 +47,11 @@ const router = trpc.router({
   updateTransaction,
   updateTransactions,
   deleteTransactions,
+  getAccountBalancesReport,
+  getBalanceForecastReport,
+  getBucketedCategoryReport,
+  getCategoryReport,
+  getIncomeVsExpensesReport,
 });
 
 export default router;

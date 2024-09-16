@@ -10,7 +10,7 @@ export const TimeGranularities = [
 ] as const;
 export const TimeGranularity = z.enum(TimeGranularities);
 export const CategoryAggregate = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
   value: z.number(),
 });
@@ -39,9 +39,9 @@ export const CategoryBucket = z.object({
 export const GetCategoryReportInput = z.object({
   type: TransactionType,
   date: DateFilter.optional(),
-  accounts: z.string().array().optional(),
+  accounts: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
-  categories: z.string().array().optional(),
+  categories: z.number().array().optional(),
 });
 export const GetCategoryReportOutput = z.object({
   categories: CategoryAggregate.array(),
@@ -50,29 +50,29 @@ export const GetCategoryReportOutput = z.object({
 export const GetBucketedCategoryReportInput = z.object({
   type: TransactionType,
   date: DateFilter.optional(),
-  accounts: z.string().array().optional(),
-  categories: z.string().array().optional(),
+  accounts: z.number().array().optional(),
+  categories: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
   granularity: TimeGranularity.optional().default('Monthly'),
 });
 export const GetBucketedCategoryReportOutput = CategoryBucket.array();
 export const GetIncomeVsExpensesReportInput = z.object({
   date: DateFilter.optional(),
-  accounts: z.string().array().optional(),
+  accounts: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
   granularity: TimeGranularity.optional().default('Monthly'),
 });
 export const GetIncomeVsExpensesReportOutput = IncomeVsExpensesBucket.array();
 export const GetAccountPositionsReportInput = z.object({
   date: DateFilter.optional(),
-  accounts: z.string().array().optional(),
+  accounts: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
   granularity: TimeGranularity.optional().default('Monthly'),
 });
 export const GetAccountPositionsReportOutput = AccountPositionsBucket.array();
 export const GetBalanceForecastReportInput = z.object({
   date: DateFilter.optional(),
-  accounts: z.string().array().optional(),
+  accounts: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
   granularity: TimeGranularity.optional().default('Monthly'),
 });

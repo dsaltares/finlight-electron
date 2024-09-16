@@ -1,9 +1,13 @@
+import { jsonObjectFrom } from 'kysely/helpers/sqlite';
 import db from '@server/db';
 import type {
   AccountTransaction,
   BankAccount,
   Category,
 } from '@server/db/types';
+import type { TransactionType } from '@server/transactions/types';
+import type { DateFilter } from '@server/types';
+import { getDateWhereFromFilter } from '@server/transactions/utils';
 import type { TimeGranularity } from './types';
 
 export type RatesByCurrency = Record<string, number>;
@@ -38,7 +42,7 @@ export async function getRates(currencies: string[]) {
 }
 
 export type TransactionResult = AccountTransaction & {
-  account: BankAccount;
+  account: BankAccount | null;
   category: Category | null;
 };
 
@@ -84,4 +88,80 @@ export function getDisplayFormatForGranularity(granularity: TimeGranularity) {
     default:
       return 'dd MMM yyyy';
   }
+}
+
+type GetTransactionsQueryInput = {
+  type?: TransactionType;
+  date?: DateFilter;
+  accounts?: number[];
+  categories?: number[];
+};
+
+export function getTransactionsQuery({
+  type,
+  date,
+  accounts,
+  categories,
+}: GetTransactionsQueryInput) {
+  let query = db
+    .selectFrom('accountTransaction')
+    .selectAll()
+    .select((eb) => [
+      jsonObjectFrom(
+        eb
+          .selectFrom('bankAccount')
+          .select([
+            'id',
+            'name',
+            'initialBalance',
+            'balance',
+            'currency',
+            'csvImportPresetId',
+            'createdAt',
+            'updatedAt',
+            'deletedAt',
+          ])
+          .whereRef('bankAccount.id', '=', 'accountTransaction.accountId'),
+      ).as('account'),
+      jsonObjectFrom(
+        eb
+          .selectFrom('category')
+          .select([
+            'id',
+            'name',
+            'importPatterns',
+            'createdAt',
+            'updatedAt',
+            'deletedAt',
+          ])
+          .whereRef('category.id', '=', 'accountTransaction.categoryId'),
+      ).as('category'),
+    ]);
+
+  if (type) {
+    query = query.where('type', '=', type);
+  }
+
+  if (accounts) {
+    query = query.where('id', 'in', accounts);
+  }
+  if (categories) {
+    query = query.where('categoryId', 'in', categories);
+  }
+  const dateFilter = getDateWhereFromFilter(date);
+  if (dateFilter.gte) {
+    const gte =
+      typeof dateFilter.gte === 'string'
+        ? dateFilter.gte
+        : dateFilter.gte.toISOString();
+    query = query.where('date', '>=', gte);
+  }
+  if (dateFilter.lte) {
+    const lte =
+      typeof dateFilter.lte === 'string'
+        ? dateFilter.lte
+        : dateFilter.lte.toISOString();
+    query = query.where('date', '<=', lte);
+  }
+  return query;
 }

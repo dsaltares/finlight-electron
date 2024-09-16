@@ -26,6 +26,7 @@
     "@electron/fuses": "^1.8.0",
     "@types/better-sqlite3": "^7.6.11",
     "@types/debug": "^4.1.12",
+    "@types/lodash.groupby": "^4.6.9",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@types/react-helmet": "^6.1.11",
@@ -72,6 +73,7 @@
     "electron-squirrel-startup": "^1.0.1",
     "fuse.js": "^7.0.0",
     "kysely": "^0.27.3",
+    "lodash.groupby": "^4.6.0",
     "notistack": "^3.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -79,6 +81,7 @@
     "react-hook-form": "^7.53.0",
     "react-router-dom": "^6.26.2",
     "react-virtuoso": "^4.10.4",
+    "recharts": "^2.12.7",
     "string-to-color": "^2.2.2",
     "zod": "^3.23.8"
   }

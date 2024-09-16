@@ -24,7 +24,7 @@ export default defineConfig((env) => {
         external,
       },
     },
-    plugins: [pluginHotRestart('restart')],
+    plugins: [pluginHotRestart('reload')],
     define,
     resolve: {
       // Load the Node.js entry.
