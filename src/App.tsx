@@ -11,12 +11,13 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
 import theme from '@styles/theme';
 import TRPCProvider from '@components/TRPCProvider';
-import Root from '@routes/root';
-import ErrorPage from '@routes/error';
-import IndexPage from '@routes/index';
-import AccountsPage from '@routes/accounts';
-import TransactionsPage from '@routes/transactions';
-import CategoriesPage from '@routes/categories';
+import Root from '@routes/RootPage';
+import ErrorPage from '@routes/ErrorPage';
+import IndexPage from '@routes/IndexPage';
+import AccountsPage from '@routes/AccountsPage';
+import TransactionsPage from '@routes/TransactionsPage';
+import CategoriesPage from '@routes/CategoriesPage';
+import ImportPresetsPage from '@routes/ImportPresetsPage';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
       { path: 'accounts', element: <AccountsPage /> },
       { path: 'transactions', element: <TransactionsPage /> },
       { path: 'categories', element: <CategoriesPage /> },
+      { path: 'importPresets', element: <ImportPresetsPage /> },
     ],
   },
 ]);

@@ -15,6 +15,9 @@ import deleteTransactions from './transactions/deleteTransactions';
 import createCategory from './category/createCategory';
 import updateCategory from './category/updateCategory';
 import deleteCategory from './category/deleteCategory';
+import createCSVImportPreset from './csvImportPreset/createCSVImportPreset';
+import updateCSVImportPreset from './csvImportPreset/updateCSVImportPreset';
+import deleteCSVImportPreset from './csvImportPreset/deleteCSVImportPreset';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -26,6 +29,9 @@ const router = trpc.router({
   updateAccount,
   deleteAccount,
   getCSVImportPresets,
+  createCSVImportPreset,
+  updateCSVImportPreset,
+  deleteCSVImportPreset,
   getCategories,
   createCategory,
   updateCategory,
