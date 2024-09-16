@@ -103,7 +103,7 @@ export type TransactionUpdate = Updateable<AccountTransactionTable>;
 export type BudgetGranularity = 'Monthly' | 'Quarterly' | 'Yearly';
 export interface BugetTable {
   id: Generated<number>;
-  granularity: BudgetGranularity;
+  granularity: Generated<BudgetGranularity>;
   createdAt: Generated<string>;
   updatedAt: Generated<string>;
 }

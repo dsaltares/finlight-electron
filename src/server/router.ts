@@ -23,6 +23,8 @@ import getBalanceForecastReport from './reports/getBalanceForecastReport';
 import getBucketedCategoryReport from './reports/getBucketedCategoryReport';
 import getCategoryReport from './reports/getCategoryReport';
 import getIncomeVsExpensesReport from './reports/getIncomeVsExpensesReport';
+import updateBudget from './budget/updateBudget';
+import getBudget from './budget/getBudget';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -52,6 +54,8 @@ const router = trpc.router({
   getBucketedCategoryReport,
   getCategoryReport,
   getIncomeVsExpensesReport,
+  getBudget,
+  updateBudget,
 });
 
 export default router;
