@@ -3,6 +3,7 @@ import path from 'path';
 import { migrateToLatest } from '@server/db/migrations';
 import router from '@server/router';
 import { createIPCHandler } from '@lib/electron-trpc/main';
+import setAppMenu from './appMenu';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -38,6 +39,7 @@ const onReady = async () => {
   await migrateToLatest();
   const window = await createWindow();
   createIPCHandler({ router, windows: [window] });
+  setAppMenu();
 };
 
 // This method will be called when Electron has finished
