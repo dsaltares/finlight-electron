@@ -5,8 +5,7 @@ import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
 import type { Database } from './types';
 
 export default function createDb() {
-  const userDataPath = app.getPath('userData');
-  const dbPath = path.join(userDataPath, 'db.sqlite');
+  const dbPath = getDbPath();
   console.log(`Using database at ${dbPath}`);
   return new Kysely<Database>({
     dialect: new SqliteDialect({
@@ -44,4 +43,12 @@ export default function createDb() {
       // }
     },
   });
+}
+
+function getDbPath() {
+  if (app.isPackaged) {
+    const userDataPath = app.getPath('userData');
+    return path.join(userDataPath, 'db.sqlite');
+  }
+  return './db.sqlite';
 }
