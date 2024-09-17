@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
 import theme from '@styles/theme';
 import TRPCProvider from '@components/TRPCProvider';
@@ -22,7 +22,7 @@ import InsightsPage from '@routes/InsightsPage';
 import BudgetPage from '@routes/BudgetPage';
 import ExchangeRatesPage from '@routes/ExchangeRatesPage';
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <Root />,
