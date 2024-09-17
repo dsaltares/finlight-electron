@@ -35,3 +35,7 @@ export function formatAmount(amount: number, currency: string | undefined) {
 export function formatPercentage(percentage: number) {
   return `${(percentage * 100).toFixed(2)}%`;
 }
+
+export function formatNumber(number: number) {
+  return new Intl.NumberFormat('en-UK').format(number);
+}
