@@ -1,11 +1,16 @@
+import { app } from 'electron';
+import path from 'path';
 import SQLite from 'better-sqlite3';
 import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
 import type { Database } from './types';
 
 export default function createDb() {
+  const userDataPath = app.getPath('userData');
+  const dbPath = path.join(userDataPath, 'db.sqlite');
+  console.log(`Using database at ${dbPath}`);
   return new Kysely<Database>({
     dialect: new SqliteDialect({
-      database: new SQLite('./db.sqlite'),
+      database: new SQLite(dbPath),
     }),
     plugins: [new ParseJSONResultsPlugin()],
     log(event) {
