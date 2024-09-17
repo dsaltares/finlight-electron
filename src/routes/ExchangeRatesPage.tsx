@@ -21,6 +21,9 @@ import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 import ExchangeRateCalculatorDialog from '@components/ExchangeRateCalculatorDialog';
 
 export default function ExchangeRatesPage() {
+  const { data: polygonKeyValue } = client.getValue.useQuery({
+    key: PolygonApiKeySettingName,
+  });
   const { data: rates, isLoading } = client.getExchangeRates.useQuery();
   const { mutate: refreshRates, isPending: isRefreshing } =
     client.refreshExchangeRates.useMutation();
@@ -78,7 +81,11 @@ export default function ExchangeRatesPage() {
             <IconButton color="primary" disabled={!rates}>
               <CalculateIcon onClick={onCalculatorDialogOpen} />
             </IconButton>
-            <IconButton color="primary" onClick={handleRefreshRates}>
+            <IconButton
+              color="primary"
+              onClick={handleRefreshRates}
+              disabled={!polygonKeyValue}
+            >
               {isRefreshing ? <CircularProgress size={24} /> : <CachedIcon />}
             </IconButton>
             <IconButton color="primary">
