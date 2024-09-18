@@ -46,6 +46,7 @@ export function getDateWhereFromFilter(date: DateFilter | undefined) {
     };
   } else if (isPeriod(date)) {
     const [gte, lte] = getDateRangeForPeriod(date);
+    console.log('PERIOD', gte, lte);
     return {
       gte,
       lte,
@@ -59,25 +60,34 @@ function getDateRangeForPeriod(period: Period | '') {
   const today = startOfToday();
   switch (period) {
     case 'last30Days':
-      return [addDays(today, -30), now];
+      return [createUTCDate(addDays(today, -30)), now];
     case 'last90Days':
-      return [addDays(today, -90), now];
+      return [createUTCDate(addDays(today, -90)), now];
     case 'currentMonth':
-      return [startOfMonth(now), endOfMonth(now)];
+      return [createUTCDate(startOfMonth(now)), createUTCDate(endOfMonth(now))];
     case 'lastMonth': {
-      const oneMonthAgo = addMonths(now, -1);
-      return [startOfMonth(oneMonthAgo), endOfMonth(oneMonthAgo)];
+      const oneMonthAgo = addMonths(today, -1);
+      return [
+        createUTCDate(startOfMonth(oneMonthAgo)),
+        createUTCDate(endOfMonth(oneMonthAgo)),
+      ];
     }
     case 'last3Months': {
       const oneMonthAgo = addMonths(now, -1);
       const threeMonthsAgo = addMonths(now, -3);
-      return [startOfMonth(threeMonthsAgo), endOfMonth(oneMonthAgo)];
+      return [
+        createUTCDate(startOfMonth(threeMonthsAgo)),
+        createUTCDate(endOfMonth(oneMonthAgo)),
+      ];
     }
     case 'currentYear':
-      return [startOfYear(now), endOfYear(now)];
+      return [createUTCDate(startOfYear(now)), createUTCDate(endOfYear(now))];
     case 'lastYear': {
       const oneYearAgo = addYears(now, -1);
-      return [startOfYear(oneYearAgo), endOfYear(oneYearAgo)];
+      return [
+        createUTCDate(startOfYear(oneYearAgo)),
+        createUTCDate(endOfYear(oneYearAgo)),
+      ];
     }
     default:
       return [undefined, undefined];
