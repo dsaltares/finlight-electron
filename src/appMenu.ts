@@ -1,4 +1,4 @@
-import { app, shell, Menu } from 'electron';
+import { app, Menu } from 'electron';
 
 export default function setAppMenu() {
   const isMac = process.platform === 'darwin';
@@ -10,14 +10,7 @@ export default function setAppMenu() {
           {
             label: app.name,
             submenu: [
-              {
-                label: 'About',
-                click: async () => {
-                  await shell.openExternal(
-                    'https://github.com/dsaltares/finlight-electron',
-                  );
-                },
-              },
+              { role: 'about' },
               { type: 'separator' },
               { role: 'services' },
               { type: 'separator' },
@@ -33,6 +26,22 @@ export default function setAppMenu() {
     {
       label: 'File',
       submenu: [isMac ? { role: 'close' } : { role: 'quit' }],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+        { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
+        { type: 'separator' },
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        {
+          label: 'Select All',
+          accelerator: 'CmdOrCtrl+A',
+          selector: 'selectAll:',
+        },
+      ],
     },
     {
       label: 'View',

@@ -153,7 +153,7 @@ export default function ExchangeRateCalculatorDialog({
               setToCurrency(fromCurrency);
             }}
           >
-            <SwapVertIcon />
+            <SwapVertIcon fontSize="large" />
           </IconButton>
         </Stack>
       </DialogContent>

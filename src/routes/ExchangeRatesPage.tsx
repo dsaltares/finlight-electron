@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet';
-import CachedIcon from '@mui/icons-material/Cached';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
@@ -7,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
-import CircularProgress from '@mui/material/CircularProgress';
 import client from '@lib/client';
 import AppName from '@lib/appName';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
@@ -19,18 +17,13 @@ import useDialog from '@components/useDialog';
 import ExchangeRatesSettingsDialog from '@components/ExchangeRatesSettingsDialog';
 import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 import ExchangeRateCalculatorDialog from '@components/ExchangeRateCalculatorDialog';
+import RefreshRatesButton from '@components/RefreshRatesButton';
 
 export default function ExchangeRatesPage() {
   const { data: polygonKeyValue } = client.getValue.useQuery({
     key: PolygonApiKeySettingName,
   });
   const { data: rates, isLoading } = client.getExchangeRates.useQuery();
-  const { mutate: refreshRates, isPending: isRefreshing } =
-    client.refreshExchangeRates.useMutation();
-  const handleRefreshRates = () => refreshRates();
-  const { data: polygonApiKey } = client.getValue.useQuery({
-    key: PolygonApiKeySettingName,
-  });
   const { mutateAsync: updateValue, isPending: isUpdatingSettings } =
     client.updateValue.useMutation();
   const { filtersByField, setFilters } = useFiltersFromUrl();
@@ -81,13 +74,7 @@ export default function ExchangeRatesPage() {
             <IconButton color="primary" disabled={!rates}>
               <CalculateIcon onClick={onCalculatorDialogOpen} />
             </IconButton>
-            <IconButton
-              color="primary"
-              onClick={handleRefreshRates}
-              disabled={!polygonKeyValue}
-            >
-              {isRefreshing ? <CircularProgress size={24} /> : <CachedIcon />}
-            </IconButton>
+            <RefreshRatesButton />
             <IconButton color="primary">
               <SettingsIcon onClick={onSettingsDialogOpen} />
             </IconButton>
@@ -98,7 +85,7 @@ export default function ExchangeRatesPage() {
           <ExchangeRatesSettingsDialog
             open={isSettingsDialogOpen}
             loading={isUpdatingSettings}
-            apiKey={polygonApiKey?.value}
+            apiKey={polygonKeyValue?.value}
             onClose={onSettingsDialogClose}
             onUpdate={updateValue}
           />
