@@ -1,5 +1,9 @@
 import createDb from './createDb';
 
-const db = createDb();
+let db = createDb();
 
 export default db;
+
+export function refreshDb() {
+  db = createDb();
+}

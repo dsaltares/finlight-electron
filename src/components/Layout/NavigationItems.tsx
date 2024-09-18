@@ -5,6 +5,7 @@ import SavingsIcon from '@mui/icons-material/Savings';
 import LabelIcon from '@mui/icons-material/Label';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import SettingsIcon from '@mui/icons-material/Settings';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -48,6 +49,11 @@ const items = [
     label: 'Exchange Rates',
     href: Routes.exchangeRates,
     icon: CurrencyExchangeIcon,
+  },
+  {
+    label: 'Settings',
+    href: Routes.settings,
+    icon: SettingsIcon,
   },
 ];
 

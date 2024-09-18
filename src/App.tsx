@@ -21,6 +21,7 @@ import ImportPresetsPage from '@routes/ImportPresetsPage';
 import InsightsPage from '@routes/InsightsPage';
 import BudgetPage from '@routes/BudgetPage';
 import ExchangeRatesPage from '@routes/ExchangeRatesPage';
+import SettingsPage from '@routes/SettingsPage';
 
 const router = createHashRouter([
   {
@@ -36,6 +37,7 @@ const router = createHashRouter([
       { path: 'insights', element: <InsightsPage /> },
       { path: 'budget', element: <BudgetPage /> },
       { path: 'exchangeRates', element: <ExchangeRatesPage /> },
+      { path: 'settings', element: <SettingsPage /> },
     ],
   },
 ]);

@@ -21,6 +21,7 @@ const RouteTitles: Record<string, string> = {
   '/importPresets': 'Import Presets',
   '/budget': 'Budget',
   '/exchangeRates': 'Exchange Rates',
+  '/settings': 'Settings',
 };
 
 export default function HeaderBar({ onOpenSidebar }: Props) {

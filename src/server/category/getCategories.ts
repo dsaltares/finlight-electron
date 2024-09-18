@@ -2,7 +2,7 @@ import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
 import { GetCategorysInput, GetCategorysOutput } from './types';
 
-const getCategorys: Procedure<
+const getCategories: Procedure<
   GetCategorysInput,
   GetCategorysOutput
 > = async () =>
@@ -16,4 +16,4 @@ const getCategorys: Procedure<
 export default procedure
   .input(GetCategorysInput)
   .output(GetCategorysOutput)
-  .query(getCategorys);
+  .query(getCategories);
