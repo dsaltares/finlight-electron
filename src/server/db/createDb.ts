@@ -1,15 +1,14 @@
-import { app } from 'electron';
-import path from 'path';
 import SQLite from 'better-sqlite3';
 import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
+import { getUserSettings } from '@server/userSettings/store';
 import type { Database } from './types';
 
 export default function createDb() {
-  const dbPath = getDbPath();
-  console.log(`Using database at ${dbPath}`);
+  const settings = getUserSettings();
+  console.log(`Using database at ${settings.dbPath}`);
   return new Kysely<Database>({
     dialect: new SqliteDialect({
-      database: new SQLite(dbPath),
+      database: new SQLite(settings.dbPath),
     }),
     plugins: [new ParseJSONResultsPlugin()],
     log(event) {
@@ -43,12 +42,4 @@ export default function createDb() {
       // }
     },
   });
-}
-
-function getDbPath() {
-  if (app.isPackaged) {
-    const userDataPath = app.getPath('userData');
-    return path.join(userDataPath, 'db.sqlite');
-  }
-  return './db.sqlite';
 }

@@ -9,7 +9,7 @@ export const KeyValuePair = z.object({
 export const GetKeyValuePairInput = z.object({
   key: z.string(),
 });
-export const GetKeyValuePairOutput = KeyValuePair;
+export const GetKeyValuePairOutput = KeyValuePair.nullable();
 export const UpdateKeyValuePairInput = z.object({
   key: z.string(),
   value: z.string(),

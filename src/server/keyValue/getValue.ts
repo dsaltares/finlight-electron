@@ -5,12 +5,14 @@ import { GetKeyValuePairInput, GetKeyValuePairOutput } from './types';
 const getValue: Procedure<
   GetKeyValuePairInput,
   GetKeyValuePairOutput
-> = async ({ input: { key } }) =>
-  db
+> = async ({ input: { key } }) => {
+  const keyValue = await db
     .selectFrom('keyValue')
     .selectAll()
     .where('key', '=', key)
-    .executeTakeFirstOrThrow();
+    .executeTakeFirst();
+  return keyValue || null;
+};
 
 export default procedure
   .input(GetKeyValuePairInput)
