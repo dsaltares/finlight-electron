@@ -1,5 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -10,10 +11,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import stringToColor from 'string-to-color';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
 import { formatAmount } from '@lib/format';
 import Routes from '@lib/routes';
 import flags from '@lib/flags';
 import type { Account } from '@server/accounts/types';
+import useImportTransactions from '@lib/useImportTransactions';
 
 type Props = {
   account: Account;
@@ -26,13 +29,13 @@ export default function AccountListItem({
   onUpdate,
   onDelete,
 }: Props) {
-  // const {
-  //   fileInputRef,
-  //   handleUploadClick,
-  //   handleFileSelected,
-  //   isLoading: isImportingTransactions,
-  //   canImport,
-  // } = useImportTransactions(account);
+  const {
+    fileInputRef,
+    handleUploadClick,
+    handleFileSelected,
+    isPending: isImportingTransactions,
+    canImport,
+  } = useImportTransactions(account);
 
   return (
     <ListItem disableGutters disablePadding>
@@ -60,7 +63,7 @@ export default function AccountListItem({
           }
         />
         <Stack direction="row" gap={1}>
-          {/* {canImport && (
+          {canImport && (
             <IconButton
               onClick={(e) => {
                 e.preventDefault();
@@ -74,7 +77,7 @@ export default function AccountListItem({
                 <FileUploadIcon />
               )}
             </IconButton>
-          )} */}
+          )}
           <IconButton
             onClick={(e) => {
               onUpdate(account.id);
@@ -93,13 +96,13 @@ export default function AccountListItem({
           </IconButton>
         </Stack>
       </ListItemButton>
-      {/* <input
+      <input
         ref={fileInputRef}
         hidden
         type="file"
         accept="text/csv"
         onChange={handleFileSelected}
-      /> */}
+      />
     </ListItem>
   );
 }
