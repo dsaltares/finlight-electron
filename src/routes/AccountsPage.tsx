@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import Stack from '@mui/material/Stack';
 import { Helmet } from 'react-helmet';
+import { enqueueSnackbar } from 'notistack';
 import CreateUpdateAccountDialog from '@components/CreateUpdateAccountDialog';
 import EmptyState from '@components/EmptyState';
 import AccountList from '@components/AccountList';
@@ -22,7 +23,20 @@ export default function AccountsPage() {
     onClose: onCreateDialogClose,
   } = useDialog();
   const { mutateAsync: createAccount, isPending: isCreating } =
-    client.createAccount.useMutation();
+    client.createAccount.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Account created.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to create account. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   const isLoading = isLoadingAccounts || isLoadingPresets;
   let content = null;

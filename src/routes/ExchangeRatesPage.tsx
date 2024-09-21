@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
+import { enqueueSnackbar } from 'notistack';
 import client from '@lib/client';
 import AppName from '@lib/appName';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
@@ -25,7 +26,20 @@ export default function ExchangeRatesPage() {
   });
   const { data: rates, isLoading } = client.getExchangeRates.useQuery();
   const { mutateAsync: updateValue, isPending: isUpdatingSettings } =
-    client.updateValue.useMutation();
+    client.updateValue.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Settings updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update settings. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const { filtersByField, setFilters } = useFiltersFromUrl();
   const {
     open: isSettingsDialogOpen,

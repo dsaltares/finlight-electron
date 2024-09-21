@@ -9,6 +9,7 @@ const createTransactions: Procedure<
 > = async ({ input: { accountId, transactions: data } }) => {
   await db
     .selectFrom('bankAccount')
+    .select('id')
     .where('id', '=', accountId)
     .executeTakeFirstOrThrow();
   const transactions = await db

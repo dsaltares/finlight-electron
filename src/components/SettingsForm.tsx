@@ -6,6 +6,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
+import { enqueueSnackbar } from 'notistack';
 import client from '@lib/client';
 import type { UserSettings } from '@server/userSettings/types';
 import Fab from './Fab';
@@ -19,8 +20,20 @@ type Props = {
 };
 
 export default function SettingsForm({ settings }: Props) {
-  const { mutate: updateUserSettings } =
-    client.updateUserSettings.useMutation();
+  const { mutate: updateUserSettings } = client.updateUserSettings.useMutation({
+    onSuccess: () => {
+      enqueueSnackbar({
+        message: 'Settings updated.',
+        variant: 'success',
+      });
+    },
+    onError: (e) => {
+      enqueueSnackbar({
+        message: `Failed to update settings. ${e.message}`,
+        variant: 'error',
+      });
+    },
+  });
   const {
     register,
     handleSubmit,

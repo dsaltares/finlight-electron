@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
+import { enqueueSnackbar } from 'notistack';
 import type { Category } from '@server/category/types';
 import useDialogForId from '@lib/useDialogForId';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
@@ -25,7 +26,20 @@ export default function CategoryList({ categories }: Props) {
     onClose: onDeleteClose,
   } = useDialogForId();
   const { mutateAsync: deleteCategory, isPending: isDeleting } =
-    client.deleteCategory.useMutation();
+    client.deleteCategory.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Category deleted.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to delete category. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const handleDelete = () =>
     openFor ? deleteCategory({ id: openFor }) : undefined;
 
@@ -40,7 +54,20 @@ export default function CategoryList({ categories }: Props) {
     [categories, categoryId],
   );
   const { mutateAsync: updateCategory, isPending: isUpdating } =
-    client.updateCategory.useMutation();
+    client.updateCategory.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Category updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update category. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   const { filtersByField, setFilters } = useFiltersFromUrl();
   const fuse = useMemo(

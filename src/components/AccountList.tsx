@@ -2,6 +2,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
 import Paper from '@mui/material/Paper';
+import { enqueueSnackbar } from 'notistack';
 import type { CSVImportPreset } from '@server/csvImportPreset/types';
 import useDialogForId from '@lib/useDialogForId';
 import type { Account } from '@server/accounts/types';
@@ -23,7 +24,19 @@ export default function AccountList({ accounts, presets }: Props) {
     onClose: onDeleteClose,
   } = useDialogForId();
   const { mutateAsync: deleteAccount, isPending: isDeleting } =
-    client.deleteAccount.useMutation();
+    client.deleteAccount.useMutation({
+      onSuccess: () =>
+        enqueueSnackbar({
+          message: 'Account deleted.',
+          variant: 'success',
+        }),
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to delete account. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const handleDelete = () =>
     openFor ? deleteAccount({ id: openFor }) : undefined;
 
@@ -38,7 +51,19 @@ export default function AccountList({ accounts, presets }: Props) {
     [accounts, accountId],
   );
   const { mutateAsync: updateAccount, isPending: isUpdating } =
-    client.updateAccount.useMutation();
+    client.updateAccount.useMutation({
+      onSuccess: () =>
+        enqueueSnackbar({
+          message: 'Account updated.',
+          variant: 'success',
+        }),
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update account. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   return (
     <Paper>

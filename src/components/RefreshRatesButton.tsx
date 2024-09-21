@@ -2,6 +2,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import CachedIcon from '@mui/icons-material/Cached';
 import Tooltip from '@mui/material/Tooltip';
+import { enqueueSnackbar } from 'notistack';
 import client from '@lib/client';
 import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 
@@ -10,7 +11,20 @@ export default function RefreshRatesButton() {
     key: PolygonApiKeySettingName,
   });
   const { mutate: refreshRates, isPending: isRefreshing } =
-    client.refreshExchangeRates.useMutation();
+    client.refreshExchangeRates.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Exchange rates refreshed.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to refresh exchange rates. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const handleRefreshRates = () => {
     if (!polygonKeyValue) {
       return;

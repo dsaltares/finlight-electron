@@ -9,6 +9,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
+import { SnackbarProvider } from 'notistack';
 import theme from '@styles/theme';
 import TRPCProvider from '@components/TRPCProvider';
 import Root from '@routes/RootPage';
@@ -47,21 +48,28 @@ export default function App() {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <CssBaseline />
       <ThemeProvider theme={theme}>
-        <TRPCProvider>
-          <Stack
-            width="100%"
-            sx={{
-              '@supports (height: 100dvh)': {
-                height: '100dvh',
-              },
-              '@supports not (height: 100dvh)': {
-                height: '100vh',
-              },
-            }}
-          >
-            <RouterProvider router={router} />
-          </Stack>
-        </TRPCProvider>
+        <SnackbarProvider
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          preventDuplicate
+          dense
+          autoHideDuration={1500}
+        >
+          <TRPCProvider>
+            <Stack
+              width="100%"
+              sx={{
+                '@supports (height: 100dvh)': {
+                  height: '100dvh',
+                },
+                '@supports not (height: 100dvh)': {
+                  height: '100vh',
+                },
+              }}
+            >
+              <RouterProvider router={router} />
+            </Stack>
+          </TRPCProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </LocalizationProvider>
   );

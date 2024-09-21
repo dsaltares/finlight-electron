@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import LabelIcon from '@mui/icons-material/Label';
 import Stack from '@mui/material/Stack';
 import { Helmet } from 'react-helmet';
+import { enqueueSnackbar } from 'notistack';
 import Fab from '@components/Fab';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
 import EmptyState from '@components/EmptyState';
@@ -19,7 +20,20 @@ export default function CategoriesPage() {
     onClose: onCreateDialogClose,
   } = useDialog();
   const { mutateAsync: createCategory, isPending: isCreating } =
-    client.createCategory.useMutation();
+    client.createCategory.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Category created.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to create category. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   let content = null;
   if (isLoading) {

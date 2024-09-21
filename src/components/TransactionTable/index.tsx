@@ -15,6 +15,7 @@ import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import TableBody from '@mui/material/TableBody';
 import { TableVirtuoso, type TableComponents } from 'react-virtuoso';
+import { enqueueSnackbar } from 'notistack';
 import useSortFromUrl from '@lib/useSortFromUrl';
 import type { Category } from '@server/category/types';
 import useDialogForId from '@lib/useDialogForId';
@@ -70,13 +71,39 @@ export default function TransactionTable({
   } = useDialogForId();
 
   const { mutateAsync: updateTransaction, isPending: isUpdating } =
-    client.updateTransaction.useMutation();
+    client.updateTransaction.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Transaction updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update transaction. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const transaction = useMemo(
     () => transactions?.find((transaction) => transaction.id === transactionId),
     [transactions, transactionId],
   );
   const { mutateAsync: deleteTransactions, isPending: isDeleting } =
-    client.deleteTransactions.useMutation();
+    client.deleteTransactions.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Transactions deleted.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to delete transactions. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const handleSingleDelete = () =>
     deleteOpenFor ? deleteTransactions({ ids: [deleteOpenFor] }) : undefined;
   const handleMultiDelete = async () => {
@@ -86,7 +113,20 @@ export default function TransactionTable({
     onRowSelectionChange({});
   };
   const { mutateAsync: updateTransactions, isPending: isMultiUpdating } =
-    client.updateTransactions.useMutation();
+    client.updateTransactions.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Transactions updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update transactions. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   const handleMultiUpdate = async (
     data: Omit<UpdateTransactionsInput, 'ids'>,

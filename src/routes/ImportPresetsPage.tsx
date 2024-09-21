@@ -2,6 +2,7 @@ import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Stack from '@mui/material/Stack';
 import { Helmet } from 'react-helmet';
+import { enqueueSnackbar } from 'notistack';
 import client from '@lib/client';
 import Fab from '@components/Fab';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
@@ -19,7 +20,20 @@ export default function ImportPresetsPage() {
     onClose: onCreateDialogClose,
   } = useDialog();
   const { mutateAsync: createCSVImportPreset, isPending: isCreating } =
-    client.createCSVImportPreset.useMutation();
+    client.createCSVImportPreset.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Import preset created.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to create import preset. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   let content = null;
   if (isLoading) {

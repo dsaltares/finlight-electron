@@ -2,6 +2,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
 import Paper from '@mui/material/Paper';
+import { enqueueSnackbar } from 'notistack';
 import useDialogForId from '@lib/useDialogForId';
 import type { CSVImportPreset } from '@server/csvImportPreset/types';
 import client from '@lib/client';
@@ -21,7 +22,20 @@ export default function CSVImportPresetList({ presets }: Props) {
     onClose: onDeleteClose,
   } = useDialogForId();
   const { mutateAsync: deletePreset, isPending: isDeleting } =
-    client.deleteCSVImportPreset.useMutation();
+    client.deleteCSVImportPreset.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Import preset deleted.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to delete import preset. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const handleDelete = () =>
     openFor ? deletePreset({ id: openFor }) : undefined;
 
@@ -36,7 +50,20 @@ export default function CSVImportPresetList({ presets }: Props) {
     [presets, presetId],
   );
   const { mutateAsync: updatePreset, isPending: isUpdating } =
-    client.updateCSVImportPreset.useMutation();
+    client.updateCSVImportPreset.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Import preset updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update import preset. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   return (
     <Paper>

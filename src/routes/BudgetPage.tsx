@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { keepPreviousData } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet';
+import { enqueueSnackbar } from 'notistack';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
 import client from '@lib/client';
@@ -45,7 +46,20 @@ export default function BudgetPage() {
       },
     );
   const { mutate: updateBudget, isPending: isUpdating } =
-    client.updateBudget.useMutation();
+    client.updateBudget.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Budget updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update budget. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
   const { control } = useForm<BudgetFormValues>({
     mode: 'onBlur',
     defaultValues: {

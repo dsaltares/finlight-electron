@@ -11,6 +11,7 @@ import Badge from '@mui/material/Badge';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Helmet } from 'react-helmet';
+import { enqueueSnackbar } from 'notistack';
 import TransactionTable from '@components/TransactionTable';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import Fab from '@components/Fab';
@@ -74,7 +75,20 @@ export default function TransactionsPage() {
   const { data: categories, isLoading: isLoadingCategories } =
     client.getCategories.useQuery();
   const { mutateAsync: createTransaction, isPending: isCreating } =
-    client.createTransaction.useMutation();
+    client.createTransaction.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Transaction created.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to create transaction. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
 
   const isLoading =
     isLoadingTransactions || isLoadingAccounts || isLoadingCategories;
