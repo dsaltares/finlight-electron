@@ -1,9 +1,8 @@
 import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
-// eslint-disable-next-line import/no-cycle
-import { refreshDb } from '@server/db';
 import type { UserSettings } from './types';
+import UserSettingsEventEmitter from './UserSettingsEventEmitter';
 
 export function getUserSettings(): UserSettings {
   const exists = settingsExist();
@@ -53,7 +52,7 @@ function applyUserSettingsChanges(old: UserSettings, settings: UserSettings) {
     } catch (e) {
       console.error('Failed to move database file', e);
     }
-    refreshDb();
+    UserSettingsEventEmitter.emit('dbPathChanged', settings.dbPath);
   }
 }
 

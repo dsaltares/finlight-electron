@@ -1,14 +1,12 @@
 import SQLite from 'better-sqlite3';
 import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
-import { getUserSettings } from '@server/userSettings/store';
 import type { Database } from './types';
 
-export default function createDb() {
-  const settings = getUserSettings();
-  console.log(`Using database at ${settings.dbPath}`);
+export default function createDb(dbPath: string) {
+  console.log(`Using database at ${dbPath}`);
   return new Kysely<Database>({
     dialect: new SqliteDialect({
-      database: new SQLite(settings.dbPath),
+      database: new SQLite(dbPath),
     }),
     plugins: [new ParseJSONResultsPlugin()],
     log(event) {
