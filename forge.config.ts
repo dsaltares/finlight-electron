@@ -10,13 +10,25 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: './images/icon',
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      iconUrl: 'https://finlight.saltares.com/favicon.ico',
+      setupIcon: './images/icon.ico',
+    }),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerRpm({
+      options: {
+        icon: './images/icon.png',
+      },
+    }),
+    new MakerDeb({
+      options: {
+        icon: './images/icon.png',
+      },
+    }),
   ],
   plugins: [
     new VitePlugin({

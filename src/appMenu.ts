@@ -1,4 +1,5 @@
-import { app, Menu } from 'electron';
+import { Menu } from 'electron';
+import AppName from '@lib/appName';
 
 export default function setAppMenu() {
   const isMac = process.platform === 'darwin';
@@ -8,7 +9,7 @@ export default function setAppMenu() {
     ...(isMac
       ? [
           {
-            label: app.name,
+            label: AppName,
             submenu: [
               { role: 'about' },
               { type: 'separator' },
