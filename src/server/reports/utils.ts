@@ -136,12 +136,12 @@ export function getTransactionsQuery({
           ])
           .whereRef('category.id', '=', 'accountTransaction.categoryId'),
       ).as('category'),
-    ]);
+    ])
+    .where('deletedAt', 'is', null);
 
   if (type) {
     query = query.where('type', '=', type);
   }
-
   if (accounts) {
     query = query.where('id', 'in', accounts);
   }

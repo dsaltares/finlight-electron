@@ -83,6 +83,7 @@ export default function CategorizedExpensesOverTimeReport() {
           {selectedCategories?.map((category) => (
             <Bar
               key={category.name}
+              name={category.name}
               dataKey={(datum) => datum.categories[category.name] || 0}
               stackId="a"
               fill={stringToColor(category.name)}

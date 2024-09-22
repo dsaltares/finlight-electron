@@ -33,7 +33,7 @@ const getCategoryReport: Procedure<
   const transactionsByCategory = transactions.reduce<
     Record<number, TransactionResult[]>
   >((acc, transaction) => {
-    const categoryId = transaction.categoryId || 0;
+    const categoryId = transaction.categoryId || -1;
     const transactionsForCategory = acc[categoryId] || [];
     return {
       ...acc,
