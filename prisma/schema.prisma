@@ -1,0 +1,205 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String?
+  email            String?           @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  bankAccounts     BankAccount[]
+  categories       Category[]
+  cSVImportPresets CSVImportPreset[]
+  budgets          Budget[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ExchangeRate {
+  id     String   @id @default(cuid())
+  ticker String
+  open   Float
+  high   Float
+  low    Float
+  close  Float
+  date   DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ticker, date])
+}
+
+model BankAccount {
+  id                String    @id @default(cuid())
+  userId            String
+  name              String
+  initialBalance    Float     @default(0)
+  balance           Float     @default(0)
+  currency          String
+  csvImportPresetId String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  csvImportPreset CSVImportPreset? @relation(fields: [csvImportPresetId], references: [id], onDelete: SetNull)
+  transactions    Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Category {
+  id             String   @id @default(cuid())
+  name           String
+  importPatterns String[]
+  userId         String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  budgetEntries BudgetEntry[]
+
+  @@unique([userId, name])
+}
+
+enum TransactionType {
+  Income
+  Expense
+  Transfer
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Float
+  date        DateTime        @default(now())
+  description String          @default("")
+  accountId   String
+  type        TransactionType @default(Expense)
+  categoryId  String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  deletedAt   DateTime?
+
+  account  BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+enum CSVImportField {
+  Date
+  Amount
+  Withdrawal
+  Deposit
+  Fee
+  Description
+  Ignore
+}
+
+model CSVImportPreset {
+  id     String @id @default(cuid())
+  name   String
+  userId String
+
+  fields          CSVImportField[]
+  dateFormat      String
+  delimiter       String
+  decimal         String
+  rowsToSkipStart Int              @default(0)
+  rowsToSkipEnd   Int              @default(0)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts BankAccount[]
+}
+
+enum BudgetGranularity {
+  Monthly
+  Quarterly
+  Yearly
+}
+
+model Budget {
+  id          String            @id @default(cuid())
+  userId      String
+  granularity BudgetGranularity @default(Monthly)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries BudgetEntry[]
+
+  @@unique([userId])
+}
+
+enum BudgetEntryType {
+  Income
+  Expense
+}
+
+model BudgetEntry {
+  id         String          @id @default(cuid())
+  type       BudgetEntryType
+  budgetId   String
+  categoryId String
+  target     Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  budget   Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([budgetId, categoryId])
+}

@@ -5,14 +5,16 @@
   "description": "Personal finance app",
   "main": ".vite/build/main.js",
   "scripts": {
-    "postinstall": "./node_modules/.bin/electron-rebuild",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+    "rebuild": "./node_modules/.bin/electron-rebuild -m ./node_modules/better-sqlite3",
+    "postinstall": "yarn rebuild",
     "lint": "eslint --ext .ts,.tsx .",
     "prettier": "prettier --write .",
-    "migrateToLatest": "tsx ./src/scripts/migrateToLatest.ts"
+    "migrateToLatest": "tsx ./src/scripts/migrateToLatest.ts",
+    "importFromWeb": "tsx ./src/scripts/importFromWeb.ts"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
@@ -24,6 +26,7 @@
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron-forge/plugin-vite": "^7.4.0",
     "@electron/fuses": "^1.8.0",
+    "@prisma/client": "^5.19.1",
     "@types/better-sqlite3": "^7.6.11",
     "@types/debug": "^4.1.12",
     "@types/lodash.groupby": "^4.6.9",
@@ -39,6 +42,7 @@
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-import": "^2.25.0",
     "prettier": "^3.3.3",
+    "prisma": "^5.19.1",
     "ts-node": "^10.0.0",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
