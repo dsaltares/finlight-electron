@@ -30,6 +30,19 @@ const config: ForgeConfig = {
       },
     }),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'dsaltares',
+          name: 'finlight',
+        },
+        prerelease: true,
+        generateReleaseNotes: true,
+      },
+    },
+  ],
   plugins: [
     new VitePlugin({
       // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
