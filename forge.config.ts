@@ -11,6 +11,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: './images/icon',
+    executableName: 'finlight',
   },
   rebuildConfig: {},
   makers: [
@@ -29,6 +30,19 @@ const config: ForgeConfig = {
         icon: './images/icon.png',
       },
     }),
+  ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'dsaltares',
+          name: 'finlight',
+        },
+        prerelease: true,
+        generateReleaseNotes: true,
+      },
+    },
   ],
   plugins: [
     new VitePlugin({
