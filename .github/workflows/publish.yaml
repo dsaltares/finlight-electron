@@ -4,6 +4,8 @@ on:
     tags:
       - 'v*'
 
+permissions: write-all
+
 jobs:
   publish:
     strategy:

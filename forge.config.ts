@@ -37,7 +37,7 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: 'dsaltares',
-          name: 'finlight',
+          name: 'finlight-electron',
         },
         prerelease: true,
         generateReleaseNotes: true,
