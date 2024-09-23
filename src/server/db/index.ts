@@ -4,14 +4,17 @@ import UserSettingsEventEmitter from '@server/userSettings/UserSettingsEventEmit
 import createDb from './createDb';
 import type { Database } from './types';
 
-let db: Kysely<Database> = refreshDb();
+let db: Kysely<Database> = getDb();
 
 export default db;
 
 UserSettingsEventEmitter.on('dbPathChanged', refreshDb);
 
 export function refreshDb() {
+  db = getDb();
+}
+
+function getDb() {
   const dbPath = getUserSettings().dbPath;
-  db = createDb(dbPath);
-  return db;
+  return createDb(dbPath);
 }

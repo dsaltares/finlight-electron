@@ -3,6 +3,7 @@ import path from 'path';
 import { migrateToLatest } from '@server/db/migrations';
 import router from '@server/router';
 import { createIPCHandler } from '@lib/electron-trpc/main';
+import { getUserSettings } from '@server/userSettings/store';
 import setAppMenu from './appMenu';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -37,7 +38,7 @@ const createWindow = async () => {
 };
 
 const onReady = async () => {
-  await migrateToLatest();
+  await migrateToLatest(getUserSettings().dbPath);
   const window = await createWindow();
   createIPCHandler({ router, windows: [window] });
   setAppMenu();

@@ -1,7 +1,6 @@
 import { subDays } from 'date-fns/subDays';
 import { startOfYesterday } from 'date-fns/startOfYesterday';
 import { isWeekend } from 'date-fns/isWeekend';
-import { format } from 'date-fns/format';
 import { TRPCError } from '@trpc/server';
 import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
@@ -15,25 +14,38 @@ const refreshExchangeRate: Procedure<
   RefreshExchangeRateOutput
 > = async () => {
   const date = getLastWeekday();
-  const formattedDate = format(date, 'yyyy-MM-dd');
-  console.log(`Fetching exchange rates for ${formattedDate}`);
+  console.log(`Fetching exchange rates for ${date}`);
 
-  const keyValue = await db
+  const polygonApiKey = await db
     .selectFrom('keyValue')
     .selectAll()
     .where('key', '=', PolygonApiKeySettingName)
     .executeTakeFirst();
-  if (!keyValue) {
+  if (!polygonApiKey) {
     throw new TRPCError({
       code: 'NOT_FOUND',
       message: 'Polygon API key not found',
     });
   }
 
-  const rates = await getPolygonRates({
-    date,
-    apiKey: keyValue.value,
-  });
+  await refreshRates(date, polygonApiKey.value);
+};
+
+export default procedure
+  .input(RefreshExchangeRateInput)
+  .output(RefreshExchangeRateOutput)
+  .mutation(refreshExchangeRate);
+
+function getLastWeekday() {
+  let date = startOfYesterday();
+  while (isWeekend(date)) {
+    date = subDays(date, 1);
+  }
+  return date;
+}
+
+async function refreshRates(date: Date, apiKey: string) {
+  const rates = await getPolygonRates({ date, apiKey });
 
   await db.transaction().execute(async (trx) => {
     for (const rate of rates) {
@@ -54,17 +66,4 @@ const refreshExchangeRate: Procedure<
         .execute();
     }
   });
-};
-
-export default procedure
-  .input(RefreshExchangeRateInput)
-  .output(RefreshExchangeRateOutput)
-  .mutation(refreshExchangeRate);
-
-function getLastWeekday() {
-  let date = startOfYesterday();
-  while (isWeekend(date)) {
-    date = subDays(date, 1);
-  }
-  return date;
 }

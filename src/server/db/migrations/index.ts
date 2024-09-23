@@ -1,10 +1,9 @@
 import { Migrator } from 'kysely';
 import createDb from '../createDb';
-import { getUserSettings } from '@server/userSettings/store';
 import ProgrammaticMigrationProvider from './ProgrammaticMigrationProvider';
 
-export async function migrateToLatest() {
-  const db = createDb(getUserSettings().dbPath);
+export async function migrateToLatest(dbPath: string) {
+  const db = createDb(dbPath);
 
   const migrator = new Migrator({
     db,
