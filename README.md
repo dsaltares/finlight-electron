@@ -1,4 +1,4 @@
-# Finlight
+![Finlight](screenshots/finlight.png)
 
 Finlight is a simple personal finance app.
 
