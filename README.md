@@ -2,7 +2,7 @@
 
 Finlight is a simple personal finance app.
 
-### Features
+## Features
 
 - 🔐 Local and privacy first, you 100% own your data.
 - 🏦 Multi-account.
@@ -12,7 +12,7 @@ Finlight is a simple personal finance app.
 - 💰 Budgeting.
 - 🙌 Cross platform: Linux, Windows and Mac.
 
-### Technologies
+## Technologies
 
 - 🖥️ [Electron](https://www.electronjs.org/)
 - ⚛️ [React](https://react.dev/)
@@ -23,7 +23,27 @@ Finlight is a simple personal finance app.
 - 📊 [Recharts](https://recharts.org/en-US/)
 - 🛣️ [React Router](https://reactrouter.com/en/main)
 
-### Screenshots
+## Getting started
+
+Clone the repo
+
+```
+git clone git@github.com:dsaltares/finlight-electron.git
+```
+
+Install dependencies
+
+```
+yarn
+```
+
+Run the app
+
+```
+yarn start
+```
+
+## Screenshots
 
 Check your overall balance normalised to a common currency.
 ![Accounts](screenshots/screenshot_013.png)
@@ -47,6 +67,6 @@ Auto-categorise transactions on CSV import via keywords.
 Refresh exchange rates via [Polygon.io](https://polygon.io/) with your own API key.
 ![exchange rates](screenshots/screenshot_001.png)
 
-### License
+## License
 
 Finlight is licensed under [MIT](./LICENSE).
