@@ -21,7 +21,7 @@ import ExchangeRateCalculatorDialog from '@components/ExchangeRateCalculatorDial
 import RefreshRatesButton from '@components/RefreshRatesButton';
 
 export default function ExchangeRatesPage() {
-  const { data: polygonKeyValue } = client.getValue.useQuery({
+  const { data: polygonApiKey } = client.getValue.useQuery({
     key: PolygonApiKeySettingName,
   });
   const { data: rates, isLoading } = client.getExchangeRates.useQuery();
@@ -99,7 +99,7 @@ export default function ExchangeRatesPage() {
           <ExchangeRatesSettingsDialog
             open={isSettingsDialogOpen}
             loading={isUpdatingSettings}
-            apiKey={polygonKeyValue?.value}
+            apiKey={polygonApiKey?.value}
             onClose={onSettingsDialogClose}
             onUpdate={updateValue}
           />

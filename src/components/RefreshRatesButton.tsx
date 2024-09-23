@@ -7,7 +7,7 @@ import client from '@lib/client';
 import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 
 export default function RefreshRatesButton() {
-  const { data: polygonKeyValue } = client.getValue.useQuery({
+  const { data: polygonApiKey } = client.getValue.useQuery({
     key: PolygonApiKeySettingName,
   });
   const { mutate: refreshRates, isPending: isRefreshing } =
@@ -26,7 +26,7 @@ export default function RefreshRatesButton() {
       },
     });
   const handleRefreshRates = () => {
-    if (!polygonKeyValue) {
+    if (!polygonApiKey) {
       return;
     }
     refreshRates();
@@ -42,7 +42,7 @@ export default function RefreshRatesButton() {
     </IconButton>
   );
 
-  return !polygonKeyValue ? (
+  return !polygonApiKey ? (
     <Tooltip title="Provide your Polygon.io API key in settings">
       {button}
     </Tooltip>
