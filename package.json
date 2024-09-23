@@ -12,9 +12,9 @@
     "rebuild": "./node_modules/.bin/electron-rebuild -m ./node_modules/better-sqlite3",
     "postinstall": "yarn rebuild",
     "lint": "eslint --ext .ts,.tsx .",
+    "typecheck": "tsc --noEmit",
     "prettier": "prettier --write .",
     "migrateToLatest": "tsx ./src/scripts/migrateToLatest.ts",
-    "importFromWeb": "tsx ./src/scripts/importFromWeb.ts",
     "generateDemoData": "dotenv -e .env -- tsx ./src/scripts/generateDemoData.ts"
   },
   "devDependencies": {

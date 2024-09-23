@@ -1,18 +1,13 @@
-name: Build
+name: Check
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-    runs-on: ${{ matrix.os }}
+  check:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,5 +15,7 @@ jobs:
           node-version-file: './.nvmrc'
       - name: install dependencies
         run: yarn install
-      - name: build
-        run: yarn make
+      - name: lint
+        run: yarn lint
+      - name: typecheck
+        run: yarn typecheck
