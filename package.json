@@ -1,7 +1,7 @@
 {
   "name": "finlight",
   "productName": "Finlight",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Personal finance app",
   "main": ".vite/build/main.js",
   "scripts": {
