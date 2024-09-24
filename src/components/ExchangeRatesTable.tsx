@@ -19,11 +19,13 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 import flags from '@lib/flags';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import useSortFromUrl from '@lib/useSortFromUrl';
 import type { ExchangeRate } from '@server/exchangeRates/types';
-import { formatAmount, formatDate } from '@lib/format';
+import { formatDate } from '@lib/format';
 
 export const DefaultSort = { id: 'ticker', desc: true };
 
@@ -33,10 +35,14 @@ const ExchangeRateTableRow = memo(ExchangeRateTableRowBase);
 
 type Props = {
   rates: ExchangeRate[];
+  onUpdateRate: (idx: number, rate: ExchangeRate) => void;
 };
 
-export default function ExchangeRatesTableTable({ rates }: Props) {
-  const table = useExchangeRatesTable(rates);
+export default function ExchangeRatesTableTable({
+  rates,
+  onUpdateRate,
+}: Props) {
+  const table = useExchangeRatesTable(rates, onUpdateRate);
 
   return (
     <Paper>
@@ -54,7 +60,10 @@ export default function ExchangeRatesTableTable({ rates }: Props) {
   );
 }
 
-function useExchangeRatesTable(rates: ExchangeRate[]) {
+function useExchangeRatesTable(
+  rates: ExchangeRate[],
+  onUpdateRate: Props['onUpdateRate'],
+) {
   const { sorting } = useSortFromUrl(DefaultSort);
   const { filtersByField } = useFiltersFromUrl();
 
@@ -87,9 +96,31 @@ function useExchangeRatesTable(rates: ExchangeRate[]) {
       columnHelper.accessor('close', {
         header: 'Rate',
         cell: (info) => (
-          <Typography fontSize="inherit">
-            {formatAmount(info.getValue(), info.row.original.code)}
-          </Typography>
+          <TextField
+            defaultValue={info.getValue() || 1.0}
+            type="number"
+            size="small"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {info.row.original.code}
+                  </InputAdornment>
+                ),
+              },
+            }}
+            inputProps={{
+              step: 0.0001,
+              min: 0,
+              style: { textAlign: 'right' },
+            }}
+            onChange={(e) =>
+              onUpdateRate(info.row.index, {
+                ...info.row.original,
+                close: parseFloat(e.target.value),
+              })
+            }
+          />
         ),
         meta: { numeric: true },
       }),

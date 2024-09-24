@@ -3,10 +3,13 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import AddIcon from '@mui/icons-material/Add';
+import SaveIcon from '@mui/icons-material/Save';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import { enqueueSnackbar } from 'notistack';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { useCallback, useEffect } from 'react';
 import client from '@lib/client';
 import AppName from '@lib/appName';
 import FullScreenSpinner from '@components/Layout/FullScreenSpinner';
@@ -19,6 +22,7 @@ import ExchangeRatesSettingsDialog from '@components/ExchangeRatesSettingsDialog
 import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 import ExchangeRateCalculatorDialog from '@components/ExchangeRateCalculatorDialog';
 import RefreshRatesButton from '@components/RefreshRatesButton';
+import type { ExchangeRate } from '@server/exchangeRates/types';
 
 export default function ExchangeRatesPage() {
   const { data: polygonApiKey } = client.getValue.useQuery({
@@ -52,11 +56,16 @@ export default function ExchangeRatesPage() {
     onClose: onCalculatorDialogClose,
   } = useDialog();
 
+  const { handleUpdateRates, isUpdating, formRates, updateRate } =
+    useExchangeRatesForm(rates);
+
   let content = null;
   if (isLoading) {
     content = <FullScreenSpinner />;
   } else if (rates && rates.length > 0) {
-    content = <ExchangeRatesTable rates={rates || []} />;
+    content = (
+      <ExchangeRatesTable rates={formRates} onUpdateRate={updateRate} />
+    );
   } else {
     content = (
       <EmptyState Icon={CurrencyExchangeIcon}>
@@ -88,6 +97,9 @@ export default function ExchangeRatesPage() {
             <IconButton color="primary" disabled={!rates}>
               <CalculateIcon onClick={onCalculatorDialogOpen} />
             </IconButton>
+            <IconButton color="primary" disabled={isUpdating}>
+              <SaveIcon onClick={handleUpdateRates} />
+            </IconButton>
             <RefreshRatesButton />
             <IconButton color="primary">
               <SettingsIcon onClick={onSettingsDialogOpen} />
@@ -118,3 +130,53 @@ export default function ExchangeRatesPage() {
     </>
   );
 }
+
+type ExchangeRatesFormValues = {
+  rates: ExchangeRate[];
+};
+
+const useExchangeRatesForm = (rates: ExchangeRate[] | undefined) => {
+  const { mutate: updateExchangeRates, isPending: isUpdating } =
+    client.updateExchangeRates.useMutation({
+      onSuccess: () => {
+        enqueueSnackbar({
+          message: 'Exchange rates updated.',
+          variant: 'success',
+        });
+      },
+      onError: (e) => {
+        enqueueSnackbar({
+          message: `Failed to update exchange rates. ${e.message}`,
+          variant: 'error',
+        });
+      },
+    });
+
+  const { control } = useForm<ExchangeRatesFormValues>({
+    mode: 'onBlur',
+    defaultValues: {
+      rates: rates || [],
+    },
+  });
+  const {
+    fields: formRates,
+    update: updateRate,
+    replace: replaceRates,
+  } = useFieldArray({
+    control,
+    name: 'rates',
+  });
+
+  useEffect(() => replaceRates(rates || []), [rates, replaceRates]);
+
+  const handleUpdateRates = useCallback(() => {
+    updateExchangeRates(formRates);
+  }, [formRates, updateExchangeRates]);
+
+  return {
+    handleUpdateRates,
+    isUpdating,
+    formRates,
+    updateRate,
+  };
+};
