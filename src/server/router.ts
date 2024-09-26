@@ -26,13 +26,14 @@ import getIncomeVsExpensesReport from './reports/getIncomeVsExpensesReport';
 import updateBudget from './budget/updateBudget';
 import getBudget from './budget/getBudget';
 import getExchangeRates from './exchangeRates/getExchangeRates';
-import upsertExchangeRate from './exchangeRates/upsertExchangeRate';
 import refreshExchangeRates from './exchangeRates/refreshExchangeRates';
 import getValue from './keyValue/getValue';
 import updateValue from './keyValue/updateValue';
 import updateUserSettings from './userSettings/updateUserSettings';
 import getUserSettings from './userSettings/getUserSettings';
 import showFileSaveDialog from './main/showFileSaveDialog';
+import updateExchangeRates from './exchangeRates/updateExchangeRates';
+import createExchangeRate from './exchangeRates/createExchangeRate';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -65,7 +66,8 @@ const router = trpc.router({
   getBudget,
   updateBudget,
   getExchangeRates,
-  upsertExchangeRate,
+  createExchangeRate,
+  updateExchangeRates,
   refreshExchangeRates,
   getValue,
   updateValue,

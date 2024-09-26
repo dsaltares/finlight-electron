@@ -27,6 +27,7 @@ export default function CurrencyAutocomplete({
 }: Props) {
   return (
     <Autocomplete
+      fullWidth
       disableClearable
       id="currency-autocomplete"
       value={value}
