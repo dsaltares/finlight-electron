@@ -23,6 +23,7 @@ import { PolygonApiKeySettingName } from '@lib/getPolygonRates';
 import ExchangeRateCalculatorDialog from '@components/ExchangeRateCalculatorDialog';
 import RefreshRatesButton from '@components/RefreshRatesButton';
 import type { ExchangeRate } from '@server/exchangeRates/types';
+import CreateExchangeRateDialog from '@components/CreateExchangeRateDialog';
 
 export default function ExchangeRatesPage() {
   const { data: polygonApiKey } = client.getValue.useQuery({
@@ -54,6 +55,11 @@ export default function ExchangeRatesPage() {
     open: isCalculatorDialogOpen,
     onOpen: onCalculatorDialogOpen,
     onClose: onCalculatorDialogClose,
+  } = useDialog();
+  const {
+    open: isUpdateDialogOpen,
+    onOpen: onUpdateDialogOpen,
+    onClose: onUpdateDialogClose,
   } = useDialog();
 
   const { handleUpdateRates, isUpdating, formRates, updateRate } =
@@ -116,15 +122,21 @@ export default function ExchangeRatesPage() {
             onUpdate={updateValue}
           />
         )}
-        {isCalculatorDialogOpen && rates && (
+        {isCalculatorDialogOpen && formRates && (
           <ExchangeRateCalculatorDialog
             open={isCalculatorDialogOpen}
             onClose={onCalculatorDialogClose}
-            rates={rates}
+            rates={formRates}
+          />
+        )}
+        {isUpdateDialogOpen && formRates && (
+          <CreateExchangeRateDialog
+            open={isUpdateDialogOpen}
+            onClose={onUpdateDialogClose}
           />
         )}
       </Stack>
-      <Fab aria-label="New rate">
+      <Fab aria-label="New rate" onClick={onUpdateDialogOpen}>
         <AddIcon />
       </Fab>
     </>

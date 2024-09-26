@@ -46,7 +46,6 @@ export function getDateWhereFromFilter(date: DateFilter | undefined) {
     };
   } else if (isPeriod(date)) {
     const [gte, lte] = getDateRangeForPeriod(date);
-    console.log('PERIOD', gte, lte);
     return {
       gte,
       lte,

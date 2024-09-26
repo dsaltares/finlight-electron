@@ -33,6 +33,7 @@ import updateUserSettings from './userSettings/updateUserSettings';
 import getUserSettings from './userSettings/getUserSettings';
 import showFileSaveDialog from './main/showFileSaveDialog';
 import updateExchangeRates from './exchangeRates/updateExchangeRates';
+import createExchangeRate from './exchangeRates/createExchangeRate';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -65,6 +66,7 @@ const router = trpc.router({
   getBudget,
   updateBudget,
   getExchangeRates,
+  createExchangeRate,
   updateExchangeRates,
   refreshExchangeRates,
   getValue,
