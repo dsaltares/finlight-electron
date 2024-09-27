@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from 'electron';
+import type { BrowserWindowConstructorOptions } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
 import { migrateToLatest } from '@server/db/migrations';
 import router from '@server/router';
@@ -10,41 +11,6 @@ import setAppMenu from './appMenu';
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
-
-const createWindow = async () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-    },
-    icon: path.join(__dirname, 'images', 'icon.png'),
-  });
-
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    await mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    await mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
-    );
-  }
-
-  // Open the DevTools.
-  if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
-  }
-  return mainWindow;
-};
-
-const onReady = async () => {
-  await migrateToLatest(getUserSettings().dbPath);
-  const window = await createWindow();
-  createIPCHandler({ router, windows: [window] });
-  setAppMenu();
-};
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -67,6 +33,122 @@ app.on('activate', async () => {
     await createWindow();
   }
 });
+
+function createWindow(options?: BrowserWindowConstructorOptions) {
+  // Create the browser window.
+  const window = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    webPreferences: {
+      ...(options?.webPreferences || {}),
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+    },
+    icon: path.join(__dirname, 'images', 'icon.png'),
+  });
+
+  // and load the index.html of the app.
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    void window.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    void window.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
+  }
+
+  // Open the DevTools.
+  if (!app.isPackaged) {
+    window.webContents.openDevTools();
+  }
+
+  window.webContents.setWindowOpenHandler(({ url }) => {
+    const newUrl = maybeParseUrl(url);
+    const currentUrl = maybeParseUrl(window.webContents.getURL());
+
+    if (!newUrl || !currentUrl) {
+      return { action: 'deny' };
+    }
+
+    if (!isOpeningApp(currentUrl, newUrl)) {
+      void openExternalUrl(url);
+      return { action: 'deny' };
+    }
+
+    return {
+      action: 'allow',
+      createWindow: (options) => {
+        const newWindow = createWindow(options);
+        void newWindow.webContents.loadURL(url);
+        window.addTabbedWindow(newWindow);
+        return newWindow.webContents;
+      },
+      outlivesOpener: true,
+      overrideBrowserWindowOptions: {
+        width: 1280,
+        height: 720,
+        webPreferences: {
+          preload: path.join(__dirname, 'preload.js'),
+          nodeIntegration: true,
+        },
+      },
+    };
+  });
+
+  return window;
+}
+
+function isOpeningApp(currentUrl: URL, newUrl: URL) {
+  if (app.isPackaged) {
+    return (
+      currentUrl.protocol === 'file:' &&
+      currentUrl.protocol === newUrl.protocol &&
+      currentUrl.pathname === newUrl.pathname
+    );
+  }
+
+  return (
+    currentUrl.hostname === 'localhost' &&
+    currentUrl.host === newUrl.host &&
+    currentUrl.pathname === newUrl.pathname
+  );
+}
+
+async function openExternalUrl(url: string) {
+  const parsedUrl = maybeParseUrl(url);
+  if (!parsedUrl) {
+    return;
+  }
+
+  const { protocol } = parsedUrl;
+  // We could handle all possible link cases here, not only http/https
+  if (protocol === 'http:' || protocol === 'https:') {
+    try {
+      await shell.openExternal(url);
+    } catch (error: unknown) {
+      console.error(`Failed to open url: ${error}`);
+    }
+  }
+}
+
+function maybeParseUrl(value: string): URL | undefined {
+  if (typeof value === 'string') {
+    try {
+      return new URL(value);
+    } catch (err) {
+      // Errors are ignored, as we only want to check if the value is a valid url
+      console.error(`Failed to parse url: ${value}`);
+    }
+  }
+
+  return undefined;
+}
+
+async function onReady() {
+  await migrateToLatest(getUserSettings().dbPath);
+  const window = await createWindow();
+  createIPCHandler({ router, windows: [window] });
+  setAppMenu();
+}
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
