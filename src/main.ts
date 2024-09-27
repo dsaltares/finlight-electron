@@ -79,7 +79,11 @@ function createWindow(options?: BrowserWindowConstructorOptions) {
       createWindow: (options) => {
         const newWindow = createWindow(options);
         void newWindow.webContents.loadURL(url);
-        window.addTabbedWindow(newWindow);
+
+        if (process.platform === 'darwin') {
+          window.addTabbedWindow(newWindow);
+        }
+
         return newWindow.webContents;
       },
       outlivesOpener: true,
