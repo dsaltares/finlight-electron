@@ -12,7 +12,7 @@ import type { UserSettings } from '@server/userSettings/types';
 import Fab from './Fab';
 
 type UserSettingsFormValues = {
-  dbPath: string;
+  dataPath: string;
 };
 
 type Props = {
@@ -42,7 +42,7 @@ export default function SettingsForm({ settings }: Props) {
   } = useForm<UserSettingsFormValues>({
     mode: 'onBlur',
     defaultValues: {
-      dbPath: settings.dbPath,
+      dataPath: settings.dataPath,
     },
   });
   const onSubmit: SubmitHandler<UserSettingsFormValues> = useCallback(
@@ -51,23 +51,18 @@ export default function SettingsForm({ settings }: Props) {
     },
     [updateUserSettings],
   );
-  const { mutate: showFileSaveDialog } = client.showFileSaveDialog.useMutation({
+  const { mutate: showOpenDialog } = client.showOpenDialog.useMutation({
     onSuccess: (result) => {
       if (result) {
-        setValue('dbPath', result);
+        setValue('dataPath', result);
       }
     },
   });
   const handleOpenFileSaveDialog = () => {
-    showFileSaveDialog({
-      title: 'Select database location',
-      defaultPath: settings.dbPath,
-      filters: [
-        {
-          name: 'Sqlite',
-          extensions: ['sqlite'],
-        },
-      ],
+    showOpenDialog({
+      title: 'Select data location',
+      defaultPath: settings.dataPath,
+      properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
     });
   };
 
@@ -78,9 +73,9 @@ export default function SettingsForm({ settings }: Props) {
           <TextField
             required
             label="Database location"
-            error={!!errors.dbPath}
+            error={!!errors.dataPath}
             fullWidth
-            {...register('dbPath', { required: true })}
+            {...register('dataPath', { required: true })}
           />
           <IconButton onClick={handleOpenFileSaveDialog}>
             <FolderIcon fontSize="large" />
