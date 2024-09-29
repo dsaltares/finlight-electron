@@ -1,19 +1,16 @@
 import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import type { UserSettings } from './types';
+import { UserSettings, UserSettingsFile } from './types';
 import UserSettingsEventEmitter from './UserSettingsEventEmitter';
 
 export function getUserSettings(): UserSettings {
   const exists = settingsExist();
   if (!exists) {
-    return {
-      dbPath: path.join(app.getPath('userData'), 'db.sqlite'),
-    };
+    return createNewSettings();
   }
 
-  const settingsRaw = fs.readFileSync(getUserSettingsPath(), 'utf8');
-  return JSON.parse(settingsRaw);
+  return readSettings();
 }
 
 export function setUserSettings(settings: UserSettings) {
@@ -24,7 +21,12 @@ export function setUserSettings(settings: UserSettings) {
     console.log('No old settings to move');
   }
 
-  fs.writeFileSync(getUserSettingsPath(), JSON.stringify(settings));
+  const file: UserSettingsFile = {
+    version: 1,
+    settings,
+  };
+
+  fs.writeFileSync(getUserSettingsPath(), JSON.stringify(file, null, 2));
 
   if (oldSettings) {
     applyUserSettingsChanges(oldSettings, settings);
@@ -42,20 +44,45 @@ function settingsExist() {
   }
 }
 
-function applyUserSettingsChanges(old: UserSettings, settings: UserSettings) {
-  if (old.dbPath !== settings.dbPath) {
+function applyUserSettingsChanges(
+  oldSettings: UserSettings,
+  newSettings: UserSettings,
+) {
+  if (oldSettings.dataPath !== newSettings.dataPath) {
     try {
-      fs.copyFileSync(old.dbPath, settings.dbPath);
+      fs.renameSync(oldSettings.dataPath, newSettings.dataPath);
       console.log(
-        `Moved database file from ${old.dbPath} to ${settings.dbPath}`,
+        `Moved data files ${oldSettings.dataPath} to ${newSettings.dataPath}`,
       );
     } catch (e) {
       console.error('Failed to move database file', e);
     }
-    UserSettingsEventEmitter.emit('dbPathChanged', settings.dbPath);
+    UserSettingsEventEmitter.emit('dataPathChanged', newSettings.dataPath);
   }
 }
 
 function getUserSettingsPath() {
   return path.join(app.getPath('userData'), 'userSettings.json');
+}
+
+function createNewSettings(): UserSettings {
+  const file: UserSettingsFile = {
+    version: 1,
+    settings: {
+      dataPath: path.join(app.getPath('userData'), 'data'),
+    },
+  };
+  fs.writeFileSync(getUserSettingsPath(), JSON.stringify(file, null, 2));
+  return UserSettings.parse(file.settings);
+}
+
+function readSettings() {
+  const settingsRaw = JSON.parse(
+    fs.readFileSync(getUserSettingsPath(), 'utf8'),
+  );
+  const settingsFile = UserSettingsFile.parse(settingsRaw);
+  if (settingsFile.version !== 1) {
+    throw new Error('Unsupported settings version');
+  }
+  return UserSettings.parse(settingsFile.settings);
 }

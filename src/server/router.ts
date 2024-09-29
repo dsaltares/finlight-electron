@@ -31,9 +31,9 @@ import getValue from './keyValue/getValue';
 import updateValue from './keyValue/updateValue';
 import updateUserSettings from './userSettings/updateUserSettings';
 import getUserSettings from './userSettings/getUserSettings';
-import showFileSaveDialog from './main/showFileSaveDialog';
 import updateExchangeRates from './exchangeRates/updateExchangeRates';
 import createExchangeRate from './exchangeRates/createExchangeRate';
+import showOpenDialog from './main/showOpenDialog';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -73,7 +73,7 @@ const router = trpc.router({
   updateValue,
   getUserSettings,
   updateUserSettings,
-  showFileSaveDialog,
+  showOpenDialog,
 });
 
 export default router;
