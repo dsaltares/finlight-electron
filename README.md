@@ -13,6 +13,20 @@ Finlight is a simple personal finance app.
 - 🙌 Cross platform: Linux, Windows and Mac.
 - 🧾 Receits and transaction attachments.
 
+## Installation
+
+### MacOS
+
+1. Download the darwin zip file for the [latest release](https://github.com/dsaltares/finlight-electron/releases).
+2. Extract the zip file.
+3. The app is unsigned, so you have to run `xattr -c ~/Downloads/Finlight.app`.
+4. Move the app to the `Applications` folder.
+
+### Windows
+
+1. Download the `Setup.exe` file for the [latest release](https://github.com/dsaltares/finlight-electron/releases).
+2. Run it and give it permissions to install.
+
 ## Technologies
 
 - 🖥️ [Electron](https://www.electronjs.org/)
