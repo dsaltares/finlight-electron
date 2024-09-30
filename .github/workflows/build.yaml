@@ -19,6 +19,6 @@ jobs:
         with:
           node-version-file: './.nvmrc'
       - name: install dependencies
-        run: yarn install
+        run: yarn install --network-timeout 1000000000
       - name: build
         run: yarn make

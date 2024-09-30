@@ -21,7 +21,7 @@ jobs:
         with:
           node-version-file: './.nvmrc'
       - name: install dependencies
-        run: yarn install
+        run: yarn install --network-timeout 1000000000
       - name: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
