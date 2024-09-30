@@ -15,6 +15,7 @@ export interface Database {
   budget: BugetTable;
   budgetEntry: BudgetEntryTable;
   keyValue: KeyValueTable;
+  attachment: AttachmentTable;
 }
 
 export interface ExchangeRateTable {
@@ -138,3 +139,16 @@ export interface KeyValueTable {
 export type KeyValue = Selectable<KeyValueTable>;
 export type NewKeyValue = Insertable<KeyValueTable>;
 export type KeyValueUpdate = Updateable<KeyValueTable>;
+
+export interface AttachmentTable {
+  id: Generated<number>;
+  transactionId: number;
+  filename: string;
+  type: string;
+  createdAt: Generated<string>;
+  deletedAt: string | null;
+}
+
+export type Attachment = Selectable<AttachmentTable>;
+export type NewAttachment = Insertable<AttachmentTable>;
+export type AttachmentUpdate = Updateable<AttachmentTable>;
