@@ -1,3 +1,4 @@
+import type { NotNull } from 'kysely';
 import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
 import { GetTransactionsInput, GetTransactionsOutput } from './types';
@@ -18,9 +19,17 @@ const getTransactions: Procedure<
   },
 }) => {
   let query = db
-    .selectFrom('accountTransaction')
+    .selectFrom('accountTransaction as t')
     .selectAll()
-    .where('deletedAt', 'is', null);
+    .select(({ selectFrom }) =>
+      selectFrom('attachment as a')
+        .select(({ eb }) => [eb.fn.countAll<number>().as('count')])
+        .whereRef('a.transactionId', 'is', 't.id')
+        .where('a.deletedAt', 'is not', 'null')
+        .as('numAttachments'),
+    )
+    .where('deletedAt', 'is', null)
+    .$narrowType<{ numAttachments: NotNull }>();
 
   if (accountId) {
     query = query.where('accountId', 'is', accountId);

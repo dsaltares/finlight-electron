@@ -34,6 +34,11 @@ import getUserSettings from './userSettings/getUserSettings';
 import updateExchangeRates from './exchangeRates/updateExchangeRates';
 import createExchangeRate from './exchangeRates/createExchangeRate';
 import showOpenDialog from './main/showOpenDialog';
+import createAttachment from './attachments/createAttachment';
+import getAttachments from './attachments/getAttachments';
+import deleteAttachment from './attachments/deleteAttachment';
+import showItemInFolder from './main/showItemInFolder';
+import openPath from './main/openPath';
 
 const router = trpc.router({
   helloWorld: procedure
@@ -74,6 +79,11 @@ const router = trpc.router({
   getUserSettings,
   updateUserSettings,
   showOpenDialog,
+  showItemInFolder,
+  openPath,
+  getAttachments,
+  createAttachment,
+  deleteAttachment,
 });
 
 export default router;

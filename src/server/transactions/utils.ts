@@ -38,6 +38,16 @@ export async function updateAccountBalance(accountId: number) {
     .executeTakeFirstOrThrow();
 }
 
+export async function getNumAttachments(transactionId: number) {
+  const record = await db
+    .selectFrom('attachment')
+    .select(({ eb }) => eb.fn.countAll<number>().as('count'))
+    .where('transactionId', '=', transactionId)
+    .where('deletedAt', 'is not', 'null')
+    .executeTakeFirstOrThrow();
+  return record.count;
+}
+
 export function getDateWhereFromFilter(date: DateFilter | undefined) {
   if (isDateRange(date)) {
     return {
@@ -92,5 +102,3 @@ function getDateRangeForPeriod(period: Period | '') {
       return [undefined, undefined];
   }
 }
-
-export default getDateRangeForPeriod;

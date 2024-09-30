@@ -12,6 +12,7 @@ export const Transaction = z.object({
   type: TransactionType,
   categoryId: z.number().nullable(),
   accountId: z.number(),
+  numAttachments: z.number(),
   createdAt: Date,
   updatedAt: Date,
 });
