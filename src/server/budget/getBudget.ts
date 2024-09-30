@@ -142,7 +142,9 @@ const getDateRange = (date: Date, granularity: TimeGranularity) => {
 const getActualForCategory = (
   categoryId: number,
   type: BudgetEntryType | null,
-  transactions: (Transaction & { account: BankAccount | null })[],
+  transactions: (Omit<Transaction, 'numAttachments'> & {
+    account: BankAccount | null;
+  })[],
   currency: string,
   rates: Record<string, number>,
 ) =>

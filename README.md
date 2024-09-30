@@ -11,6 +11,7 @@ Finlight is a simple personal finance app.
 - 📊 Insights.
 - 💰 Budgeting.
 - 🙌 Cross platform: Linux, Windows and Mac.
+- 🧾 Receits and transaction attachments.
 
 ## Technologies
 
@@ -51,6 +52,9 @@ Check your overall balance normalised to a common currency.
 Powerful transaction search with detailed filters.
 ![Transactions](screenshots/screenshot_012.png)
 ![Transactions](screenshots/screenshot_011.png)
+
+Attach files to transactions to save your receipts.
+![Transaction attachments](screenshots/screenshot_014.png)
 
 Visualise where your money goes, where it comes from and track it over time.
 ![Insights](screenshots/screenshot_007.png)

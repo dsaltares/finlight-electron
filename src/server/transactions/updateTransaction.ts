@@ -1,7 +1,7 @@
 import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
 import { UpdateTransactionInput, UpdateTransactionOutput } from './types';
-import { updateAccountBalance } from './utils';
+import { getNumAttachments, updateAccountBalance } from './utils';
 
 const updateTransaction: Procedure<
   UpdateTransactionInput,
@@ -19,8 +19,13 @@ const updateTransaction: Procedure<
     .returningAll()
     .where('id', 'is', id)
     .executeTakeFirstOrThrow();
-  await updateAccountBalance(transaction.accountId);
-  return transaction;
+
+  const [_account, numAttachments] = await Promise.all([
+    updateAccountBalance(transaction.accountId),
+    getNumAttachments(transaction.id),
+  ]);
+
+  return { ...transaction, numAttachments };
 };
 
 export default procedure

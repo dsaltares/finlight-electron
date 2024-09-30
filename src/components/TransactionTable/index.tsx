@@ -29,6 +29,7 @@ import type {
 } from '@server/transactions/types';
 import type { Account } from '@server/accounts/types';
 import client from '@lib/client';
+import AttachmentsDialog from '@components/AttachmentsDialog';
 import useTransactionTable, {
   DefaultSort,
   type TransactionTableRow,
@@ -68,6 +69,12 @@ export default function TransactionTable({
     open: isUpdateDialogOpen,
     onOpen: onUpdateDialogOpen,
     onClose: onUpdateDialogClose,
+  } = useDialogForId();
+  const {
+    openFor: attachmentsOpenFor,
+    open: isAttachmentsDialogOpen,
+    onOpen: onAttachmentsDialogOpen,
+    onClose: onAttachmentsDialogClose,
   } = useDialogForId();
 
   const { mutateAsync: updateTransaction, isPending: isUpdating } =
@@ -148,6 +155,7 @@ export default function TransactionTable({
     onRowSelectionChange,
     onUpdateDialogOpen,
     onDeleteDialogOpen,
+    onAttachmentsDialogOpen,
   });
 
   const fixedHeaderContent = useCallback(
@@ -249,6 +257,13 @@ export default function TransactionTable({
           categories={categories || []}
           onClose={onMultiUpdateClose}
           onUpdate={handleMultiUpdate}
+        />
+      )}
+      {!!attachmentsOpenFor && (
+        <AttachmentsDialog
+          open={isAttachmentsDialogOpen}
+          onClose={onAttachmentsDialogClose}
+          transactionId={attachmentsOpenFor}
         />
       )}
     </Paper>

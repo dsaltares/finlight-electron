@@ -27,7 +27,10 @@ const createTransaction: Procedure<
     .returningAll()
     .executeTakeFirstOrThrow();
   await updateAccountBalance(accountId);
-  return transaction;
+  return {
+    ...transaction,
+    numAttachments: 0,
+  };
 };
 
 export default procedure

@@ -13,8 +13,10 @@ import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
+import Badge from '@mui/material/Badge';
 import TransactionTypeChip from '@components/TransactionTypeChip';
 import CategoryChip from '@components/CategoryChip';
 import { formatAmount, formatDate } from '@lib/format';
@@ -61,6 +63,7 @@ type Props = {
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   onUpdateDialogOpen: (id: number) => void;
   onDeleteDialogOpen: (id: number) => void;
+  onAttachmentsDialogOpen: (id: number) => void;
 };
 
 export default function useTransactionTable({
@@ -71,6 +74,7 @@ export default function useTransactionTable({
   onRowSelectionChange,
   onUpdateDialogOpen,
   onDeleteDialogOpen,
+  onAttachmentsDialogOpen,
 }: Props) {
   const { sorting } = useSortFromUrl(DefaultSort);
   const { filtersByField } = useFiltersFromUrl();
@@ -158,22 +162,42 @@ export default function useTransactionTable({
       }),
       columnHelper.display({
         id: 'actions',
-        cell: ({ row: { original } }) => (
-          <Stack direction="row" gap={1}>
+        cell: ({ row: { original } }) => {
+          const attachmentsButton = (
             <IconButton
-              aria-label="Edit"
-              onClick={() => onUpdateDialogOpen(original.id)}
+              aria-label="Open attachments dialog"
+              onClick={() => onAttachmentsDialogOpen(original.id)}
             >
-              <EditIcon />
+              <AttachFileIcon />
             </IconButton>
-            <IconButton
-              aria-label="Delete"
-              onClick={() => onDeleteDialogOpen(original.id)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Stack>
-        ),
+          );
+          return (
+            <Stack direction="row" gap={1}>
+              {original.numAttachments > 0 ? (
+                <Badge
+                  badgeContent={`${original.numAttachments}`}
+                  color="primary"
+                >
+                  {attachmentsButton}
+                </Badge>
+              ) : (
+                attachmentsButton
+              )}
+              <IconButton
+                aria-label="Edit"
+                onClick={() => onUpdateDialogOpen(original.id)}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                aria-label="Delete"
+                onClick={() => onDeleteDialogOpen(original.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Stack>
+          );
+        },
       }),
     ],
     [onDeleteDialogOpen, onUpdateDialogOpen],
