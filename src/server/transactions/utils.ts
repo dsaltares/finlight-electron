@@ -21,6 +21,7 @@ export async function updateAccountBalance(accountId: number) {
     .selectFrom('accountTransaction')
     .select('amount')
     .where('accountId', '=', accountId)
+    .where('deletedAt', 'is', null)
     .execute();
   return db
     .updateTable('bankAccount')
