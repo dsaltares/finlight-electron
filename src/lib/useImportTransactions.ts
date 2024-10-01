@@ -85,6 +85,10 @@ const useImportTransactions = (account: Account) => {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
+        enqueueSnackbar({
+          message: 'Failed to import transactions.',
+          variant: 'error',
+        });
       }
     },
     [preset, categories, createTransactions, account.id, navigate],
