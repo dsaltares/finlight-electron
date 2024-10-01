@@ -106,7 +106,7 @@ export default function UpdateTransactionsDialog({
         );
         await onUpdate({
           ...data,
-          categoryId: data.category ? parseInt(data.category.id, 10) : null,
+          categoryId: data.categoryId ? parseInt(data.categoryId, 10) : null,
         });
       }
       onClose();
