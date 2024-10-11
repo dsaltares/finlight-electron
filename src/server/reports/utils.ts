@@ -143,7 +143,7 @@ export function getTransactionsQuery({
     query = query.where('type', '=', type);
   }
   if (accounts) {
-    query = query.where('id', 'in', accounts);
+    query = query.where('accountId', 'in', accounts);
   }
   if (categories) {
     query = query.where('categoryId', 'in', categories);
