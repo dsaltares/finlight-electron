@@ -18,3 +18,9 @@ export async function fileExistsSync(filePath: string) {
     return false;
   }
 }
+
+export function ensureFolderExistsSync(dirPath: string) {
+  if (!fileExistsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
