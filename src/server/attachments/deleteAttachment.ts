@@ -4,6 +4,7 @@ import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
 import { getUserSettings } from '@server/userSettings/store';
 import { getAttachmentsPath } from '@server/userSettings/utils';
+import { fileExists } from '@server/utils';
 import { DeleteAttachmentInput, DeleteAttachmentOutput } from './types';
 
 const deleteAttachment: Procedure<
@@ -41,12 +42,3 @@ export default procedure
   .input(DeleteAttachmentInput)
   .output(DeleteAttachmentOutput)
   .mutation(deleteAttachment);
-
-async function fileExists(filePath: string) {
-  try {
-    await fs.stat(filePath);
-    return true;
-  } catch (_e) {
-    return false;
-  }
-}
