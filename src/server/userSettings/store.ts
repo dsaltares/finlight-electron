@@ -1,6 +1,7 @@
 import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import { ensureFolderExistsSync } from '@server/utils';
 import { UserSettings, UserSettingsFile } from './types';
 import UserSettingsEventEmitter from './UserSettingsEventEmitter';
 
@@ -72,6 +73,7 @@ function createNewSettings(): UserSettings {
       dataPath: path.join(app.getPath('userData'), 'data'),
     },
   };
+  ensureFolderExistsSync(app.getPath('userData'));
   fs.writeFileSync(getUserSettingsPath(), JSON.stringify(file, null, 2));
   return UserSettings.parse(file.settings);
 }

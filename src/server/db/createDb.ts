@@ -1,8 +1,12 @@
+import path from 'path';
 import SQLite from 'better-sqlite3';
 import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
+import { ensureFolderExistsSync } from '@server/utils';
 import type { Database } from './types';
 
 export default function createDb(dbPath: string) {
+  ensureDataFolderExists(dbPath);
+
   console.log(`Using database at ${dbPath}`);
   return new Kysely<Database>({
     dialect: new SqliteDialect({
@@ -40,4 +44,10 @@ export default function createDb(dbPath: string) {
       // }
     },
   });
+}
+
+function ensureDataFolderExists(dbPath: string) {
+  const dir = path.dirname(dbPath);
+  console.log('Ensuring data directory exists', dir);
+  ensureFolderExistsSync(dir);
 }
