@@ -5,8 +5,6 @@ import '@fontsource/roboto-mono/700.css';
 import '@styles/global.css';
 import 'file-icon-vectors/dist/file-icon-classic.min.css';
 import CssBaseline from '@mui/material/CssBaseline';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
@@ -24,6 +22,7 @@ import InsightsPage from '@routes/InsightsPage';
 import BudgetPage from '@routes/BudgetPage';
 import ExchangeRatesPage from '@routes/ExchangeRatesPage';
 import SettingsPage from '@routes/SettingsPage';
+import LocalizationProvider from '@components/LocalizationProvider';
 
 const router = createHashRouter([
   {
@@ -46,7 +45,7 @@ const router = createHashRouter([
 
 export default function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider>
       <CssBaseline />
       <ThemeProvider theme={theme}>
         <SnackbarProvider
