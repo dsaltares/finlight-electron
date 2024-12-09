@@ -23,6 +23,7 @@ import type {
   TransactionType,
   UpdateTransactionInput,
 } from '@server/transactions/types';
+import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import TransactionTypeSelect from './TransactionTypeSelect';
 
 type BaseProps = {
@@ -72,6 +73,7 @@ export default function CreateUpdateTransactionDialog({
 }: Props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const { filtersByField } = useFiltersFromUrl();
   const { accountOptions, categoryOptions, defaultValues } = useMemo(() => {
     const accountOptions = accounts.map((account) => ({
       label: account.name,
@@ -81,11 +83,14 @@ export default function CreateUpdateTransactionDialog({
       label: category.name,
       id: `${category.id}`,
     }));
+    const filteredAccountId = filtersByField.accountId;
     const account = transaction
       ? accountOptions.find(
           (option) => `${transaction.accountId}` === option.id,
         )
-      : accountOptions[0] || null;
+      : accountOptions.find((option) => option.id === filteredAccountId) ||
+        accountOptions[0] ||
+        null;
     const category = transaction
       ? categoryOptions.find(
           (option) => `${transaction.categoryId}` === option.id,
@@ -105,7 +110,7 @@ export default function CreateUpdateTransactionDialog({
         category,
       },
     };
-  }, [accounts, categories, transaction]);
+  }, [accounts, categories, transaction, filtersByField]);
   const {
     control,
     register,
