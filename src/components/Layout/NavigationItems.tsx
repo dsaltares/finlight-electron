@@ -66,7 +66,7 @@ export default function NavigationItems() {
           <ListItemButton
             component={Link}
             to={item.href}
-            selected={pathname.startsWith(item.href)}
+            selected={pathname.startsWith(item.href.replace(/\?.*$/, ''))}
           >
             <ListItemIcon>
               <item.icon />
