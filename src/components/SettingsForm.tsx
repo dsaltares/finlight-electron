@@ -1,5 +1,5 @@
 import type { SubmitHandler } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useCallback } from 'react';
 import TextField from '@mui/material/TextField';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -9,10 +9,14 @@ import IconButton from '@mui/material/IconButton';
 import { enqueueSnackbar } from 'notistack';
 import client from '@lib/client';
 import type { UserSettings } from '@server/userSettings/types';
+import { currencyOptionsById } from '@lib/autoCompleteOptions';
 import Fab from './Fab';
+import CurrencyAutocomplete from './CurrencyAutocomplete';
 
+type Option = { label: string; id: string };
 type UserSettingsFormValues = {
   dataPath: string;
+  currency: Option;
 };
 
 type Props = {
@@ -39,15 +43,20 @@ export default function SettingsForm({ settings }: Props) {
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm<UserSettingsFormValues>({
     mode: 'onBlur',
     defaultValues: {
       dataPath: settings.dataPath,
+      currency: currencyOptionsById[settings.currency || 'EUR'],
     },
   });
   const onSubmit: SubmitHandler<UserSettingsFormValues> = useCallback(
     async (values) => {
-      updateUserSettings(values);
+      updateUserSettings({
+        ...values,
+        currency: values.currency.id,
+      });
     },
     [updateUserSettings],
   );
@@ -81,6 +90,20 @@ export default function SettingsForm({ settings }: Props) {
             <FolderIcon fontSize="large" />
           </IconButton>
         </Stack>
+        <Controller
+          control={control}
+          name="currency"
+          rules={{ required: true }}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <CurrencyAutocomplete
+              label="Preferred currency"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              error={!!errors.currency}
+            />
+          )}
+        />
       </Stack>
       <Fab type="submit">
         <SaveIcon />

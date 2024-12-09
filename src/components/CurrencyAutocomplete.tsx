@@ -17,6 +17,7 @@ type Props = {
   onChange: (value: Option) => void;
   error?: boolean;
   onBlur?: FocusEventHandler<HTMLDivElement>;
+  label?: string;
 };
 
 export default function CurrencyAutocomplete({
@@ -24,6 +25,7 @@ export default function CurrencyAutocomplete({
   onChange,
   error,
   onBlur,
+  label = 'Currency',
 }: Props) {
   return (
     <Autocomplete
@@ -38,7 +40,7 @@ export default function CurrencyAutocomplete({
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Currency"
+          label={label}
           required
           error={error}
           InputProps={{

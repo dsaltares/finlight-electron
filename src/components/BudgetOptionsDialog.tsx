@@ -12,10 +12,10 @@ import createUTCDate from '@lib/createUTCDate';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import { currencyOptionsById } from '@lib/autoCompleteOptions';
 import { TimeGranularities, type TimeGranularity } from '@server/budget/types';
+import client from '@lib/client';
+import DefaultCurrency from '@lib/defaultCurrency';
 import TimeGranularitySelect from './TimeGranularitySelect';
 import CurrencyAutocomplete from './CurrencyAutocomplete';
-
-const DefaultCurrency = 'EUR';
 
 type Props = {
   open: boolean;
@@ -25,6 +25,8 @@ type Props = {
 const id = 'budget-options-dialog';
 
 export default function BudgetOptionsDialog({ open, onClose }: Props) {
+  const { data: settings } = client.getUserSettings.useQuery();
+  const defaultCurrency = settings?.currency ?? DefaultCurrency;
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { filtersByField, setFilters } = useFiltersFromUrl();
@@ -37,13 +39,13 @@ export default function BudgetOptionsDialog({ open, onClose }: Props) {
     (filtersByField.granularity as TimeGranularity) || '',
   );
   const [currency, setCurrency] = useState(
-    currencyOptionsById[filtersByField.currency ?? DefaultCurrency],
+    currencyOptionsById[filtersByField.currency ?? defaultCurrency],
   );
 
   const handleApplyFilters = () => {
     setFilters({
       date: date?.toISOString(),
-      currency: currency.id !== DefaultCurrency ? currency.id : undefined,
+      currency: currency.id !== defaultCurrency ? currency.id : undefined,
       granularity,
     });
     onClose();
