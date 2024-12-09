@@ -7,6 +7,7 @@ export const UserSettingsFile = z.object({
 
 const UserSettingsV1 = z.object({
   dataPath: z.string(),
+  currency: z.string().optional(),
 });
 
 export const UserSettings = UserSettingsV1;
