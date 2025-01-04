@@ -60,6 +60,7 @@ export const GetIncomeVsExpensesReportInput = z.object({
   date: DateFilter.optional(),
   accounts: z.number().array().optional(),
   currency: z.string().optional().default('EUR'),
+  categories: z.number().array().optional(),
   granularity: TimeGranularity.optional().default('Monthly'),
 });
 export const GetIncomeVsExpensesReportOutput = IncomeVsExpensesBucket.array();

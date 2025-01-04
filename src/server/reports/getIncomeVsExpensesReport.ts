@@ -18,10 +18,19 @@ import {
 const getIncomeVsExpensesReport: Procedure<
   GetIncomeVsExpensesReportInput,
   GetIncomeVsExpensesReportOutput
-> = async ({ input: { date, accounts, currency, granularity } }) => {
+> = async ({
+  input: {
+    date,
+    accounts,
+    currency,
+    granularity,
+    categories: selectedCategories,
+  },
+}) => {
   const transactions = await getTransactionsQuery({
     date,
     accounts,
+    categories: selectedCategories,
   }).execute();
   const rates = await getRates(
     Array.from(
