@@ -62,13 +62,9 @@ export default function TransactionsPage() {
       maxAmount: filtersByField.maxAmount
         ? parseFloat(filtersByField.maxAmount)
         : undefined,
-      accountId: filtersByField.accountId
-        ? parseInt(filtersByField.accountId, 10)
-        : undefined,
+      accounts: filtersByField.accounts?.split(',').map(Number),
       type: filtersByField.type as TransactionType | undefined,
-      categoryId: filtersByField.categoryId
-        ? parseInt(filtersByField.categoryId, 10)
-        : undefined,
+      categories: filtersByField.categories?.split(',').map(Number),
       description: filtersByField.description,
     });
   const { data, isLoading: isLoadingAccounts } = client.getAccounts.useQuery();

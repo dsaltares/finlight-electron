@@ -5,8 +5,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Autocomplete from '@mui/material/Autocomplete';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -15,12 +14,13 @@ import { endOfDay } from 'date-fns/endOfDay';
 import createUTCDate from '@lib/createUTCDate';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
 import type { Category } from '@server/category/types';
-import { isOptionEqualToValue } from '@lib/autoCompleteOptions';
 import { isPeriod, type Period } from '@server/types';
 import type { Account } from '@server/accounts/types';
 import type { TransactionType } from '@server/transactions/types';
 import PeriodSelect from './PeriodSelect';
 import TransactionTypeSelect from './TransactionTypeSelect';
+import AccountAutocomplete from './AccountAutocomplete';
+import CategoryAutocomplete from './CategoryAutocomplete';
 
 type Props = {
   open: boolean;
@@ -40,35 +40,18 @@ export default function TransactionFilterDialog({
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { filtersByField, setFilters } = useFiltersFromUrl();
-  const accountOptions = useMemo(
-    () =>
-      accounts.map((account) => ({
-        label: account.name,
-        id: `${account.id}`,
-      })),
-    [accounts],
+  const [selectedAccounts, setSelectedAccounts] = useState<number[]>(
+    filtersByField.accounts
+      ? filtersByField.accounts.split(',').map(Number)
+      : [],
   );
-  const categoryOptions = useMemo(
-    () =>
-      categories.map((category) => ({
-        label: category.name,
-        id: `${category.id}`,
-      })),
-    [categories],
-  );
-  const [account, setAccount] = useState(
-    () =>
-      accountOptions.find((option) => option.id === filtersByField.accountId) ||
-      null,
+  const [selectedCategories, setSelectedCategories] = useState<number[]>(
+    filtersByField.categories
+      ? filtersByField.categories.split(',').map(Number)
+      : [],
   );
   const [type, setType] = useState<TransactionType | ''>(() =>
     filtersByField.type ? (filtersByField.type as TransactionType) : '',
-  );
-  const [category, setCategory] = useState(
-    () =>
-      categoryOptions.find(
-        (option) => option.id === filtersByField.categoryId,
-      ) || null,
   );
   const [description, setDescription] = useState(filtersByField.description);
   const [period, setPeriod] = useState<Period | ''>(
@@ -94,8 +77,15 @@ export default function TransactionFilterDialog({
       minAmount,
       maxAmount,
       type: type || undefined,
-      accountId: account?.id,
-      categoryId: category?.id,
+      accounts:
+        selectedAccounts.length > 0 && selectedAccounts.length < accounts.length
+          ? selectedAccounts.join(',')
+          : undefined,
+      categories:
+        selectedCategories.length > 0 &&
+        selectedCategories.length < categories.length
+          ? selectedCategories.join(',')
+          : undefined,
       description: description || undefined,
     });
     onClose();
@@ -188,22 +178,16 @@ export default function TransactionFilterDialog({
               }}
             />
           </Stack>
-          <Autocomplete
-            id="account-autocomplete"
-            value={account}
-            onChange={(_event, newValue) => setAccount(newValue)}
-            options={accountOptions}
-            isOptionEqualToValue={isOptionEqualToValue}
-            renderInput={(params) => <TextField {...params} label="Account" />}
+          <AccountAutocomplete
+            accounts={accounts}
+            selected={selectedAccounts}
+            onChange={setSelectedAccounts}
           />
           <TransactionTypeSelect value={type} onChange={setType} clearable />
-          <Autocomplete
-            id="category-autocomplete"
-            value={category}
-            onChange={(_event, newValue) => setCategory(newValue)}
-            options={categoryOptions}
-            isOptionEqualToValue={isOptionEqualToValue}
-            renderInput={(params) => <TextField {...params} label="Category" />}
+          <CategoryAutocomplete
+            categories={categories}
+            selected={selectedCategories}
+            onChange={setSelectedCategories}
           />
           <TextField
             label="Description"

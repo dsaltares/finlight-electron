@@ -12,9 +12,9 @@ const getTransactions: Procedure<
     date,
     minAmount,
     maxAmount,
-    accountId,
+    accounts,
     type,
-    categoryId,
+    categories,
     description,
   },
 }) => {
@@ -31,8 +31,8 @@ const getTransactions: Procedure<
     .where('deletedAt', 'is', null)
     .$narrowType<{ numAttachments: NotNull }>();
 
-  if (accountId) {
-    query = query.where('accountId', 'is', accountId);
+  if (accounts && accounts.length > 0) {
+    query = query.where('accountId', 'in', accounts);
   }
 
   const dateFilter = getDateWhereFromFilter(date);
@@ -62,8 +62,8 @@ const getTransactions: Procedure<
     query = query.where('type', 'is', type);
   }
 
-  if (categoryId) {
-    query = query.where('categoryId', 'is', categoryId);
+  if (categories && categories.length > 0) {
+    query = query.where('categoryId', 'in', categories);
   }
 
   if (description) {

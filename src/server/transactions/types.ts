@@ -21,9 +21,9 @@ export const GetTransactionsInput = z.object({
   date: DateFilter.optional(),
   minAmount: z.number().optional(),
   maxAmount: z.number().optional(),
-  accountId: z.number().optional(),
+  accounts: z.number().array().optional(),
   type: TransactionType.optional(),
-  categoryId: z.number().optional(),
+  categories: z.number().array().optional(),
   description: z.string().optional(),
 });
 export const GetTransactionsOutput = z.array(Transaction);

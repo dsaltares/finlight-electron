@@ -10,7 +10,7 @@ export default function AccountLink({ id, name }: Props) {
   return (
     <LinkWithSearchParams
       pathname={Routes.transactions}
-      searchParam="filterByAccountId"
+      searchParam="filterByAccounts"
       searchValue={id}
     >
       {name}

@@ -14,7 +14,7 @@ export default function CategoryChip({ id, name }: Props) {
   return id && name ? (
     <LinkWithSearchParams
       pathname={Routes.transactions}
-      searchParam="filterByCategoryId"
+      searchParam="filterByCategories"
       searchValue={id}
     >
       <Chip

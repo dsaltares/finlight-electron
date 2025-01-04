@@ -4,7 +4,7 @@ import Chip from '@mui/material/Chip';
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaidIcon from '@mui/icons-material/Paid';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
 import client from '@lib/client';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
@@ -44,9 +44,30 @@ export default function TransactionFilterChips() {
     [categories],
   );
 
-  const handleClearType = () => setFilters({ type: undefined });
-  const handleClearAccount = () => setFilters({ accountId: undefined });
-  const handleClearCategory = () => setFilters({ categoryId: undefined });
+  const handleClearType = useCallback(
+    () => setFilters({ type: undefined }),
+    [setFilters],
+  );
+  const handleClearAccount = useCallback(
+    (accountId: string) =>
+      setFilters({
+        accounts: filtersByField.accounts
+          ?.split(',')
+          .filter((id) => id !== accountId)
+          .join(','),
+      }),
+    [setFilters, filtersByField],
+  );
+  const handleClearCategory = useCallback(
+    (categoryId: string) =>
+      setFilters({
+        categories: filtersByField.categories
+          ?.split(',')
+          .filter((id) => id !== categoryId)
+          .join(','),
+      }),
+    [filtersByField, setFilters],
+  );
   const handleClearDescription = () => setFilters({ description: undefined });
   const handleClearAmount = () =>
     setFilters({ minAmount: undefined, maxAmount: undefined });
@@ -112,13 +133,16 @@ export default function TransactionFilterChips() {
           onDelete={handleClearAmount}
         />
       )}
-      {!!filtersByField.accountId && accountsById[filtersByField.accountId] && (
-        <Chip
-          variant="outlined"
-          label={accountsById[filtersByField.accountId].name}
-          onDelete={handleClearAccount}
-        />
-      )}
+      {filtersByField.accounts
+        ?.split(',')
+        .map((accountId) => (
+          <Chip
+            key={`account-${accountId}`}
+            variant="outlined"
+            label={accountsById[accountId].name}
+            onDelete={() => handleClearAccount(accountId)}
+          />
+        ))}
       {!!filtersByField.type &&
         TransactionTypes.includes(filtersByField.type as TransactionType) && (
           <Chip
@@ -136,22 +160,23 @@ export default function TransactionFilterChips() {
             onDelete={handleClearType}
           />
         )}
-      {!!filtersByField.categoryId &&
-        categoriesById[filtersByField.categoryId] && (
-          <Chip
-            sx={{
-              backgroundColor: stringToColor(
-                categoriesById[filtersByField.categoryId].name,
-              ),
-              color: theme.palette.getContrastText(
-                stringToColor(categoriesById[filtersByField.categoryId].name),
-              ),
-            }}
-            variant="outlined"
-            label={categoriesById[filtersByField.categoryId].name}
-            onDelete={handleClearCategory}
-          />
-        )}
+      {filtersByField.categories?.split(',').map(
+        (categoryId) =>
+          categoriesById[categoryId] && (
+            <Chip
+              key={`category-${categoryId}`}
+              sx={{
+                backgroundColor: stringToColor(categoriesById[categoryId].name),
+                color: theme.palette.getContrastText(
+                  stringToColor(categoriesById[categoryId].name),
+                ),
+              }}
+              variant="outlined"
+              label={categoriesById[categoryId].name}
+              onDelete={() => handleClearCategory(categoryId)}
+            />
+          ),
+      )}
       {!!filtersByField.description && (
         <Chip
           variant="outlined"
