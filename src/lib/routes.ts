@@ -4,9 +4,9 @@ const Routes = {
   transactions: '/transactions',
   recentTransactions: '/transactions?filterByPeriod=lastMonth',
   transactionsForCategory: (categoryId: number) =>
-    `/transactions?filterByCategoryId=${categoryId}&filterByPeriod=lastMonth`,
+    `/transactions?filterByCategories=${categoryId}&filterByPeriod=lastMonth`,
   transactionsForAccount: (accountId: number) =>
-    `/transactions?filterByAccountId=${accountId}&filterByPeriod=lastMonth`,
+    `/transactions?filterByAccounts=${accountId}&filterByPeriod=lastMonth`,
   accounts: '/accounts',
   insights: '/insights?filterByPeriod=lastMonth',
   budget: '/budget',

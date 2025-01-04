@@ -83,7 +83,9 @@ export default function CreateUpdateTransactionDialog({
       label: category.name,
       id: `${category.id}`,
     }));
-    const filteredAccountId = filtersByField.accountId;
+    const filteredAccounts = filtersByField.accounts?.split(',');
+    const filteredAccountId =
+      filteredAccounts?.length === 1 ? filteredAccounts[0] : '';
     const account = transaction
       ? accountOptions.find(
           (option) => `${transaction.accountId}` === option.id,
