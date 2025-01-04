@@ -18,8 +18,8 @@ import { isPeriod, type Period } from '@server/types';
 import type { Category } from '@server/category/types';
 import type { Account } from '@server/accounts/types';
 import PeriodSelect from '@components/PeriodSelect';
-import AccountSelect from '@components/AccountSelect';
-import CategorySelect from '@components/CategorySelect';
+import AccountAutocomplete from '@components/AccountAutocomplete';
+import CategoryAutocomplete from '@components/CategoryAutocomplete';
 import TimeGranularitySelect from '@components/TimeGranularitySelect';
 import CurrencyAutocomplete from '@components/CurrencyAutocomplete';
 
@@ -157,12 +157,12 @@ export default function ReportSettingsDialog({
               />
             </Stack>
           </Stack>
-          <AccountSelect
+          <AccountAutocomplete
             accounts={accounts}
             selected={selectedAccounts}
             onChange={setSelectedAccounts}
           />
-          <CategorySelect
+          <CategoryAutocomplete
             categories={categories}
             selected={selectedCategories}
             onChange={setSelectedCategories}
