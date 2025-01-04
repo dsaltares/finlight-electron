@@ -26,6 +26,7 @@ export default function IncomeVsExpensesReport() {
     accounts: filtersByField.accounts?.split(',').map(Number),
     currency: filtersByField.currency,
     granularity: filtersByField.timeGranularity as TimeGranularity,
+    categories: filtersByField.categories?.split(',').map(Number),
   });
 
   if (isLoading) {
