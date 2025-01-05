@@ -13,6 +13,7 @@ import IncomeVsExpensesReport from '@components/Reports/IncomeVsExpensesReport';
 import AccountBalancesReport from '@components/Reports/AccountBalancesReport';
 import BalanceForecastReport from '@components/Reports/BalanceForecastReport';
 import CategorizedExpensesOverTimeReport from '@components/Reports/CategorizedExpensesOverTimeReport';
+import CategorizedIncomeOverTimeReport from '@components/Reports/CategorizedIncomeOverTimeReport';
 import AppName from '@lib/appName';
 import client from '@lib/client';
 import useFiltersFromUrl from '@lib/useFiltersFromUrl';
@@ -32,6 +33,10 @@ const Reports = {
   categorizedExpensesOverTime: {
     name: 'Where the money goes over time',
     Component: CategorizedExpensesOverTimeReport,
+  },
+  categorizedIncomeOverTime: {
+    name: 'Where the money comes from over time',
+    Component: CategorizedIncomeOverTimeReport,
   },
   incomeVsExpenses: {
     name: 'Income vs Expenses',
