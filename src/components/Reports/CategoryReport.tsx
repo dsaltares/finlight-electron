@@ -15,8 +15,7 @@ import CategoryChip from '../CategoryChip';
 import useIsMobile from '@lib/useIsMobile';
 import ChartContainer from './ChartContainer';
 import PieLabel from './PieLabel';
-
-type NumberType = 'positive' | 'negative' | 'neutral';
+import { numberTypeToColor, type NumberType } from './utils';
 
 type Props = {
   data: GetCategoryReportOutput;
@@ -95,15 +94,4 @@ export default function CategoryReport({
       </Grid>
     </Grid>
   );
-}
-
-function numberTypeToColor(numberType: NumberType = 'neutral') {
-  switch (numberType) {
-    case 'positive':
-      return 'success.main';
-    case 'negative':
-      return 'error';
-    default:
-      return 'inherit';
-  }
 }

@@ -6,11 +6,11 @@ import client from '@lib/client';
 import NoTransactionsFound from './NoTransactionsFound';
 import CategoryOverTimeReport from './CategoryOverTimeReport';
 
-export default function CategorizedExpensesOverTimeReport() {
+export default function CategorizedIncomeOverTimeReport() {
   const { filtersByField } = useFiltersFromUrl();
   const { data, isLoading: isLoadingReport } =
     client.getBucketedCategoryReport.useQuery({
-      type: 'Expense',
+      type: 'Income',
       date: getDateFilter(filtersByField),
       accounts: filtersByField.accounts?.split(',').map(Number),
       categories: filtersByField.categories?.split(',').map(Number),
@@ -32,7 +32,7 @@ export default function CategorizedExpensesOverTimeReport() {
       data={data}
       currency={currency}
       categories={categories}
-      numberType="negative"
+      numberType="positive"
     />
   );
 }
