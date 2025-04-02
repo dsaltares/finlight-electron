@@ -1,14 +1,15 @@
 import currencyCodes from 'currency-codes';
 import { type Procedure, procedure } from '@server/trpc';
 import db from '@server/db';
+import logger from '@server/logger';
 import { CreateExchangeRateInput, CreateExchangeRateOutput } from './types';
 
 const createExchangeRate: Procedure<
   CreateExchangeRateInput,
   CreateExchangeRateOutput
 > = async ({ input: { ticker, close } }) => {
-  console.log('ticker', ticker);
-  console.log('close', close);
+  logger.info('ticker', ticker);
+  logger.info('close', close);
   const inserted = await db
     .insertInto('exchangeRate')
     .values({
