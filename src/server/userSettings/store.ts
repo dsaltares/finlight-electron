@@ -2,6 +2,7 @@ import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import { ensureFolderExistsSync } from '@server/utils';
+import logger from '@server/logger';
 import { UserSettings, UserSettingsFile } from './types';
 import UserSettingsEventEmitter from './UserSettingsEventEmitter';
 
@@ -19,7 +20,7 @@ export function setUserSettings(settings: UserSettings) {
   try {
     oldSettings = getUserSettings();
   } catch (e) {
-    console.log('No old settings to move');
+    logger.info('No old settings to move');
   }
 
   const file: UserSettingsFile = {
@@ -52,7 +53,7 @@ function applyUserSettingsChanges(
   if (oldSettings.dataPath !== newSettings.dataPath) {
     try {
       fs.renameSync(oldSettings.dataPath, newSettings.dataPath);
-      console.log(
+      logger.info(
         `Moved data files ${oldSettings.dataPath} to ${newSettings.dataPath}`,
       );
     } catch (e) {

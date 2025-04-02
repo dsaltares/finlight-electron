@@ -1,5 +1,6 @@
 import { Migrator } from 'kysely';
 import createDb from '../createDb';
+import logger from '@server/logger';
 import ProgrammaticMigrationProvider from './ProgrammaticMigrationProvider';
 
 export async function migrateToLatest(dbPath: string) {
@@ -14,15 +15,15 @@ export async function migrateToLatest(dbPath: string) {
 
   results?.forEach((it) => {
     if (it.status === 'Success') {
-      console.log(`migration "${it.migrationName}" was executed successfully`);
+      logger.info(`migration "${it.migrationName}" was executed successfully`);
     } else if (it.status === 'Error') {
-      console.error(`failed to execute migration "${it.migrationName}"`);
+      logger.error(`failed to execute migration "${it.migrationName}"`);
     }
   });
 
   if (error) {
-    console.error('failed to migrate');
-    console.error(error);
+    logger.error('failed to migrate');
+    logger.error(error);
     process.exit(1);
   }
 

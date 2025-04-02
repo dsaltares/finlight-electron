@@ -1,5 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import { formatNumber } from '@lib/format';
+import logger from './logger';
 
 export type ProcedureArgs<TInput> = {
   input: TInput;
@@ -17,8 +18,8 @@ const loggingMiddleware = trpc.middleware(async ({ path, type, next }) => {
   const durationStr = formatNumber(durationMs);
 
   result.ok
-    ? console.log(`tRPC OK - ${path}.${type} - ${durationStr}ms`)
-    : console.error(
+    ? logger.info(`tRPC OK - ${path}.${type} - ${durationStr}ms`)
+    : logger.error(
         `tRPC ERROR - ${path}.${type} - ${durationStr}ms - ${result.error.message} - ${result.error.stack}`,
       );
 

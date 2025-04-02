@@ -7,6 +7,7 @@ import db from '@server/db';
 import getPolygonRates, {
   PolygonApiKeySettingName,
 } from '@lib/getPolygonRates';
+import logger from '@server/logger';
 import { RefreshExchangeRateInput, RefreshExchangeRateOutput } from './types';
 
 const refreshExchangeRate: Procedure<
@@ -14,7 +15,7 @@ const refreshExchangeRate: Procedure<
   RefreshExchangeRateOutput
 > = async () => {
   const date = getLastWeekday();
-  console.log(`Fetching exchange rates for ${date}`);
+  logger.info(`Fetching exchange rates for ${date}`);
 
   const polygonApiKey = await db
     .selectFrom('keyValue')
