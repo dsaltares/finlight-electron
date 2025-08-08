@@ -11,6 +11,7 @@ import type {
   CSVImportPreset,
 } from '@server/csvImportPreset/types';
 import type { Account } from '@server/accounts/types';
+import getAllIndexesOfArray from './getAllIndexesOfArray';
 
 const useImportTransactions = (account: Account) => {
   const navigate = useNavigate();
@@ -54,10 +55,22 @@ const useImportTransactions = (account: Account) => {
         }) as string[][];
 
         const dateIndex = preset.fields.indexOf('Date');
-        const descriptionIndex = preset.fields.indexOf('Description');
+        const descriptionIndexes = getAllIndexesOfArray(preset.fields, 'Description');
 
         const transactions = records.map((record) => {
-          const description = record[descriptionIndex] || '';
+          let recordDescription = '';
+          if (descriptionIndexes.length > 0) {
+            const descriptionArray: string[] = [];
+
+            descriptionIndexes.forEach((descriptionIndex) => {
+              if (record[descriptionIndex]?.trim() !== '') {
+                descriptionArray.push(record[descriptionIndex]);
+              }
+            });
+            recordDescription = descriptionArray.join('; ');
+          }
+
+          const description = recordDescription;
           const amount = parseNumericField(record, preset, 'Amount');
           const fee = parseNumericField(record, preset, 'Fee');
           const deposit = parseNumericField(record, preset, 'Deposit');
