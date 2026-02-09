@@ -22,6 +22,6 @@
   "editor.formatOnSaveMode": "file",
   "biome.lsp.bin": "/Users/david/repos/finlight-electron/next/node_modules/@biomejs/biome/bin/biome",
   "biome.lspBin": "/Users/david/repos/finlight-electron/next/node_modules/@biomejs/biome/bin/biome",
-  "biome.lsp.cwd": "/Users/david/repos/finlight-electron/next",
+  "biome.lsp.cwd": "/Users/david/repos/finlight-electron",
   "thunder-client.followRedirects": false
 }
