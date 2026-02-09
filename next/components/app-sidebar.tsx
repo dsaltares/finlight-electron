@@ -31,6 +31,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 									alt="Finlight logo"
 									width={48}
 									height={48}
+									className="dark:hidden"
+								/>
+								<Image
+									src="/logo-no-text-dark.svg"
+									alt="Finlight logo (dark)"
+									width={48}
+									height={48}
+									className="hidden dark:block"
 								/>
 								<span className="text-2xl font-semibold leading-none">
 									Finlight
