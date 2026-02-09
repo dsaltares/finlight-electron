@@ -10,7 +10,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createTRPCClient, httpLink } from '@trpc/client';
 import { useState } from 'react';
 import superjson from 'superjson';
-import { TRPCProvider } from '@/lib/trpc'; 
+import { TRPCProvider } from '@/lib/trpc';
 import type { AppRouter } from '@/server/trpc/router';
 
 export const TrpcProvider: React.FC<{ children: React.ReactNode }> = (p) => {
