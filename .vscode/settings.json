@@ -18,6 +18,10 @@
     // Biome applies fixes; TypeScript organizes imports (removes unused)
     "source.fixAll.biome": "always"
   },
-  "editor.codeActionsOnSave.mode": "explicit",
+  "editor.codeActionsOnSave.mode": "always",
+  "editor.formatOnSaveMode": "file",
+  "biome.lsp.bin": "/Users/david/repos/finlight-electron/next/node_modules/@biomejs/biome/bin/biome",
+  "biome.lspBin": "/Users/david/repos/finlight-electron/next/node_modules/@biomejs/biome/bin/biome",
+  "biome.lsp.cwd": "/Users/david/repos/finlight-electron/next",
   "thunder-client.followRedirects": false
 }
