@@ -1,5 +1,5 @@
-import { Kysely, SqliteDialect } from 'kysely';
 import SQLite from 'better-sqlite3';
+import { Kysely, SqliteDialect } from 'kysely';
 import type { DB } from '@/server/kysely.ts';
 
 const dialect = new SqliteDialect({

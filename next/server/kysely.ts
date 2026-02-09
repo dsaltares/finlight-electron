@@ -3,4 +3,159 @@
  * Please do not edit it manually.
  */
 
-export interface DB {}
+import type { ColumnType } from "kysely";
+
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
+
+export interface Account {
+  accessToken: string | null;
+  accessTokenExpiresAt: string | null;
+  accountId: string;
+  createdAt: Generated<string>;
+  id: string;
+  idToken: string | null;
+  password: string | null;
+  providerId: string;
+  refreshToken: string | null;
+  refreshTokenExpiresAt: string | null;
+  scope: string | null;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface AccountTransaction {
+  accountId: number;
+  amount: number;
+  categoryId: number | null;
+  createdAt: Generated<string>;
+  date: Generated<string>;
+  deletedAt: string | null;
+  description: Generated<string>;
+  id: Generated<number>;
+  type: Generated<string>;
+  updatedAt: Generated<string>;
+}
+
+export interface Attachment {
+  createdAt: Generated<string>;
+  deletedAt: string | null;
+  filename: string;
+  id: Generated<number>;
+  transactionId: number;
+  type: string;
+}
+
+export interface BankAccount {
+  balance: Generated<number>;
+  createdAt: Generated<string>;
+  csvImportPresetId: number | null;
+  currency: Generated<string>;
+  deletedAt: string | null;
+  id: Generated<number>;
+  initialBalance: Generated<number>;
+  name: string;
+  updatedAt: Generated<string>;
+  userId: string;
+}
+
+export interface Budget {
+  createdAt: Generated<string>;
+  granularity: Generated<string>;
+  id: Generated<number>;
+  updatedAt: Generated<string>;
+  userId: string;
+}
+
+export interface BudgetEntry {
+  budgetId: number;
+  categoryId: number;
+  createdAt: Generated<string>;
+  id: Generated<number>;
+  target: number;
+  type: string;
+  updatedAt: Generated<string>;
+}
+
+export interface Category {
+  createdAt: Generated<string>;
+  deletedAt: string | null;
+  id: Generated<number>;
+  importPatterns: string;
+  name: string;
+  updatedAt: Generated<string>;
+  userId: string;
+}
+
+export interface CsvImportPreset {
+  createdAt: Generated<string>;
+  dateFormat: string;
+  decimal: string;
+  deletedAt: string | null;
+  delimiter: string;
+  fields: string;
+  id: Generated<number>;
+  name: string;
+  rowsToSkipEnd: Generated<number>;
+  rowsToSkipStart: Generated<number>;
+  updatedAt: Generated<string>;
+  userId: string;
+}
+
+export interface ExchangeRate {
+  close: number;
+  createdAt: Generated<string>;
+  date: string;
+  high: number;
+  id: Generated<number>;
+  low: number;
+  open: number;
+  ticker: string;
+  updatedAt: Generated<string>;
+}
+
+export interface Session {
+  createdAt: Generated<string>;
+  expiresAt: string;
+  id: string;
+  ipAddress: string | null;
+  token: string;
+  updatedAt: string;
+  userAgent: string | null;
+  userId: string;
+}
+
+export interface User {
+  createdAt: Generated<string>;
+  email: string;
+  emailVerified: number;
+  id: string;
+  image: string | null;
+  name: string;
+  updatedAt: Generated<string>;
+}
+
+export interface Verification {
+  createdAt: Generated<string>;
+  expiresAt: string;
+  id: string;
+  identifier: string;
+  updatedAt: Generated<string>;
+  value: string;
+}
+
+export interface DB {
+  account: Account;
+  account_transaction: AccountTransaction;
+  attachment: Attachment;
+  bank_account: BankAccount;
+  budget: Budget;
+  budget_entry: BudgetEntry;
+  category: Category;
+  csv_import_preset: CsvImportPreset;
+  exchange_rate: ExchangeRate;
+  session: Session;
+  user: User;
+  verification: Verification;
+}

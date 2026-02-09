@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { TrpcProvider } from '@/components/TrpcProvider';
 import { ThemeProvider } from '@/components/theme-provider';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -31,16 +32,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={jetbrainsMono.variable}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TrpcProvider>{children}</TrpcProvider>
+          <TooltipProvider>
+            <TrpcProvider>{children}</TrpcProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
