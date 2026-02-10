@@ -10,11 +10,11 @@ export default function EmptyState({
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <div className="flex flex-col items-center gap-1 p-6">
+    <div className="flex flex-col items-center gap-2 p-6">
       <span className="text-muted-foreground">
-        <Icon className="size-[42px]" />
+        <Icon className="w-12" />
       </span>
-      <p className="text-center">{children}</p>
+      <p className="text-center text-sm">{children}</p>
     </div>
   );
 }

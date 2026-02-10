@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import type { PropsWithChildren } from 'react';
 
 type Props = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
   Icon: OverridableComponent<SvgIconTypeMap<{}, 'svg'>> & {
     muiName: string;
   };
