@@ -29,7 +29,6 @@ type Props = {
   placeholder?: string;
   emptyMessage?: string;
   fullWidth?: boolean;
-  /** Custom render for each option (dropdown and selected value). Receives the option and returns ReactNode. */
   renderOption?: (option: Option) => ReactNode;
 };
 

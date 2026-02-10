@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ThemeToggle } from './theme-toggle';
+import { ThemeToggle } from './ThemeToggle';
 
 const RouteTitleMap: Record<string, string> = {
   '/dashboard': 'Dashboard',

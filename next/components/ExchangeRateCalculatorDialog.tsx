@@ -4,7 +4,7 @@ import { ArrowLeftRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import CurrencyAutocomplete, {
   currencyOptionsById,
-} from '@/components/currency-autocomplete';
+} from '@/components/CurrencyAutocomplete';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

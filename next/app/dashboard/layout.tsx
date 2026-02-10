@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { AppSidebar } from '@/components/app-sidebar';
-import { SiteHeader } from '@/components/site-header';
+import { AppSidebar } from '@/components/AppSidebar';
+import { SiteHeader } from '@/components/SiteHeader';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export default function DashboardLayout({ children }: React.PropsWithChildren) {

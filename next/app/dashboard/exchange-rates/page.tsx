@@ -2,8 +2,8 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeftRight } from 'lucide-react';
-import EmptyState from '@/components/empty-state';
-import ExchangeRateCalculatorDialog from '@/components/exchange-rate-calculator-dialog';
+import EmptyState from '@/components/EmptyState';
+import ExchangeRateCalculatorDialog from '@/components/ExchangeRateCalculatorDialog';
 import { Button } from '@/components/ui/button';
 import useDialog from '@/hooks/use-dialog';
 import { useTRPC } from '@/lib/trpc';
