@@ -10,7 +10,7 @@
     "migrate": "dotenv -- tsx scripts/migrate.ts",
     "migrate:down": "dotenv -- tsx scripts/migrate.ts down",
     "migrate:to": "dotenv -- tsx scripts/migrate.ts to",
-    "gen-types": "dotenv -- kysely-codegen --out-file server/kysely.ts"
+    "gen-types": "dotenv -- kysely-codegen --config-file kysely-codegen.config.json"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

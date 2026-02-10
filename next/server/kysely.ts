@@ -82,7 +82,7 @@ export interface Category {
   createdAt: Generated<string>;
   deletedAt: string | null;
   id: Generated<number>;
-  importPatterns: string;
+  importPatterns: ColumnType<string[], string, string>;
   name: string;
   updatedAt: Generated<string>;
   userId: string;
@@ -94,7 +94,7 @@ export interface CsvImportPreset {
   decimal: string;
   deletedAt: string | null;
   delimiter: string;
-  fields: string;
+  fields: ColumnType<("Date" | "Amount" | "Withdrawal" | "Deposit" | "Fee" | "Description" | "Ignore")[], string, string>;
   id: Generated<number>;
   name: string;
   rowsToSkipEnd: Generated<number>;

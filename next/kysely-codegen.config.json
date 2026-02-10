@@ -1,0 +1,9 @@
+{
+  "outFile": "server/kysely.ts",
+  "overrides": {
+    "columns": {
+      "csv_import_preset.fields": "ColumnType<(\"Date\" | \"Amount\" | \"Withdrawal\" | \"Deposit\" | \"Fee\" | \"Description\" | \"Ignore\")[], string, string>",
+      "category.importPatterns": "ColumnType<string[], string, string>"
+    }
+  }
+}

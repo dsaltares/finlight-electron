@@ -1,4 +1,8 @@
-import type { ColumnSort, OnChangeFn, SortingState } from '@tanstack/react-table';
+import type {
+  ColumnSort,
+  OnChangeFn,
+  SortingState,
+} from '@tanstack/react-table';
 import { parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useMemo } from 'react';
 
