@@ -37,35 +37,6 @@ const listExchangeRates = authedProcedure
     });
   });
 
-const createExchangeRate = authedProcedure
-  .input(
-    z.object({
-      ticker: z.string(),
-      close: z.number(),
-    }),
-  )
-  .output(ExchangeRateSchema)
-  .mutation(async ({ input: { ticker, close } }) => {
-    const inserted = await db
-      .insertInto('exchange_rate')
-      .values({
-        ticker,
-        close,
-        open: close,
-        low: close,
-        high: close,
-        date: new Date().toISOString(),
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
-    const data = currencyCodes.code(inserted.ticker.replace('EUR', ''));
-    return {
-      ...inserted,
-      code: data?.code || '',
-      currency: data?.currency || '',
-    };
-  });
-
 const refreshExchangeRates = authedProcedure
   .input(z.void())
   .output(z.void())
@@ -73,41 +44,7 @@ const refreshExchangeRates = authedProcedure
     await refreshRates();
   });
 
-const updateExchangeRates = authedProcedure
-  .input(
-    z.array(
-      z.object({
-        ticker: z.string(),
-        close: z.number(),
-      }),
-    ),
-  )
-  .output(z.void())
-  .mutation(async ({ input: rates }) => {
-    await db.transaction().execute(async (trx) => {
-      for (const { ticker, close } of rates) {
-        const rest = {
-          close,
-          open: close,
-          low: close,
-          high: close,
-          date: new Date().toISOString(),
-        };
-        await trx
-          .insertInto('exchange_rate')
-          .values({
-            ticker,
-            ...rest,
-          })
-          .onConflict((oc) => oc.column('ticker').doUpdateSet(rest))
-          .execute();
-      }
-    });
-  });
-
 export default {
   list: listExchangeRates,
-  create: createExchangeRate,
   refresh: refreshExchangeRates,
-  update: updateExchangeRates,
 };

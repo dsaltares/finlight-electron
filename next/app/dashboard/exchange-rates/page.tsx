@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowLeftRight, Calculator, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 import EmptyState from '@/components/EmptyState';
 import ExchangeRateCalculatorDialog from '@/components/ExchangeRateCalculatorDialog';
 import ExchangeRatesTable from '@/components/ExchangeRatesTable';
@@ -24,7 +25,14 @@ export default function ExchangeRatesPage() {
     trpc.exchangeRates.list.queryOptions(),
   );
   const { mutate: refreshRates, isPending: isRefreshing } = useMutation(
-    trpc.exchangeRates.refresh.mutationOptions(),
+    trpc.exchangeRates.refresh.mutationOptions({
+      onSuccess: () => {
+        toast.success('Exchange rates refreshed');
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Failed to refresh exchange rates');
+      },
+    }),
   );
 
   const hasRates = rates && rates.length > 0;
