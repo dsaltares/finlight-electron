@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import ColorAutocomplete from '@/components/ColorAutocomplete';
+import type { Option as ComboboxOption } from '@/components/combobox';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,8 +14,14 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label as FormLabel } from '@/components/ui/label';
-import MultipleSelector, { type Option } from '@/components/ui/multiple-selector';
+import MultipleSelector, {
+  type Option as MultipleSelectorOption,
+} from '@/components/ui/multiple-selector';
 import { Spinner } from '@/components/ui/spinner';
+import {
+  CategoryColorsByHex,
+  DefaultCategoryColor,
+} from '@/lib/categoryColors';
 import type { RouterInput } from '@/lib/trpc';
 import type { Category } from '@/server/trpc/procedures/categories';
 
@@ -39,7 +47,8 @@ type Props = BaseDialogProps & (CreateDialogProps | UpdateDialogProps);
 
 type CategoryFormValues = {
   name: string;
-  importPatterns: Option[];
+  color: string;
+  importPatterns: MultipleSelectorOption[];
 };
 
 export default function CreateUpdateCategoryDialog({
@@ -61,6 +70,7 @@ export default function CreateUpdateCategoryDialog({
     mode: 'onBlur',
     defaultValues: {
       name: category?.name ?? '',
+      color: category?.color ?? DefaultCategoryColor,
       importPatterns:
         category?.importPatterns.map((keyword) => ({
           value: keyword,
@@ -73,6 +83,7 @@ export default function CreateUpdateCategoryDialog({
     if (!open) return;
     reset({
       name: category?.name ?? '',
+      color: category?.color ?? DefaultCategoryColor,
       importPatterns:
         category?.importPatterns.map((keyword) => ({
           value: keyword,
@@ -93,11 +104,13 @@ export default function CreateUpdateCategoryDialog({
       await onUpdate({
         id: category.id,
         name: nextName,
+        color: values.color,
         importPatterns,
       });
     } else {
       await onCreate({
         name: nextName,
+        color: values.color,
         importPatterns,
       });
     }
@@ -128,7 +141,40 @@ export default function CreateUpdateCategoryDialog({
 
           <div className="flex flex-col gap-1">
             <FormLabel htmlFor="category-name">Name</FormLabel>
-            <Input id="category-name" {...register('name', { required: true })} required />
+            <Input
+              id="category-name"
+              {...register('name', { required: true })}
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <FormLabel htmlFor="category-color">Color</FormLabel>
+            <Controller
+              control={control}
+              name="color"
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => {
+                const selectedColor: ComboboxOption =
+                  value && CategoryColorsByHex[value]
+                    ? {
+                        value,
+                        label: `${CategoryColorsByHex[value].name} (${value})`,
+                      }
+                    : {
+                        value: DefaultCategoryColor,
+                        label: `${CategoryColorsByHex[DefaultCategoryColor].name} (${DefaultCategoryColor})`,
+                      };
+                return (
+                  <div id="category-color">
+                    <ColorAutocomplete
+                      value={selectedColor}
+                      onChange={(nextColor) => onChange(nextColor.value)}
+                    />
+                  </div>
+                );
+              }}
+            />
           </div>
 
           <div className="flex flex-col gap-1">

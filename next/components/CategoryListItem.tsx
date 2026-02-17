@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
+import getContrastingTextColor from '@/lib/getContastingTextColor';
 import type { RouterOutput } from '@/lib/trpc';
 
 type Category = RouterOutput['categories']['list'][number];
@@ -20,14 +21,24 @@ type Props = {
   onDelete: (id: number) => void;
 };
 
-export default function CategoryListItem({ category, onUpdate, onDelete }: Props) {
+export default function CategoryListItem({
+  category,
+  onUpdate,
+  onDelete,
+}: Props) {
   const keywordCount = category.importPatterns.length;
+  const iconColor = getContrastingTextColor(category.color);
 
   return (
     <Card className="flex-row items-center border border-border py-0 ring-0">
       <CardContent className="flex min-w-0 flex-1 items-center gap-3 py-2">
         <Avatar>
-          <AvatarFallback>
+          <AvatarFallback
+            style={{
+              backgroundColor: category.color,
+              color: iconColor,
+            }}
+          >
             <Tag className="size-4" />
           </AvatarFallback>
         </Avatar>

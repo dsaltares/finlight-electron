@@ -103,7 +103,6 @@ export default function CategoriesPage() {
         onClose={onCreateDialogClose}
         onCreate={createCategory}
       />
-
     </div>
   );
 }

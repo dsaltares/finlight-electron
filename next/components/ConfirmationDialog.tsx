@@ -43,9 +43,9 @@ export default function ConfirmationDialog({
         }
       }}
     >
-      <AlertDialogContent id={id} aria-labelledby={`${id}-title`}>
+      <AlertDialogContent id={id}>
         <AlertDialogHeader>
-          <AlertDialogTitle id={`${id}-title`}>{title}</AlertDialogTitle>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
         </AlertDialogHeader>
 
         <div className="text-sm">{children}</div>

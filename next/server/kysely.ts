@@ -79,6 +79,7 @@ export interface BudgetEntry {
 }
 
 export interface Category {
+  color: string;
   createdAt: Generated<string>;
   deletedAt: string | null;
   id: Generated<number>;

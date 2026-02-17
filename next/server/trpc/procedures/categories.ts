@@ -1,11 +1,21 @@
 import { TRPCError } from '@trpc/server';
 import z from 'zod';
+import { CategoryColorHexValues } from '@/lib/categoryColors';
 import { db } from '@/server/db';
 import { authedProcedure } from '../trpc';
+
+const categoryColorHexSet = new Set(CategoryColorHexValues);
+
+const CategoryColorSchema = z
+  .string()
+  .refine((value) => categoryColorHexSet.has(value), {
+    message: 'Invalid category color.',
+  });
 
 export const CategorySchema = z.object({
   id: z.number(),
   name: z.string(),
+  color: CategoryColorSchema,
   importPatterns: z.string().array(),
 });
 
@@ -23,7 +33,7 @@ const listCategories = authedProcedure
   });
 
 const createCategory = authedProcedure
-  .input(CategorySchema.pick({ name: true, importPatterns: true }))
+  .input(CategorySchema.pick({ name: true, color: true, importPatterns: true }))
   .output(CategorySchema)
   .mutation(async ({ ctx, input }) => {
     if (!ctx.user) {
@@ -36,6 +46,7 @@ const createCategory = authedProcedure
         deletedAt: null,
         importPatterns: JSON.stringify(input.importPatterns),
         name: input.name,
+        color: input.color,
       })
       .where('userId', '=', ctx.user.id)
       .where('name', '=', input.name)
@@ -52,6 +63,7 @@ const createCategory = authedProcedure
       .values({
         userId: ctx.user.id,
         name: input.name,
+        color: input.color,
         importPatterns: JSON.stringify(input.importPatterns),
       })
       .returningAll()
@@ -82,16 +94,23 @@ const deleteCategory = authedProcedure
   });
 
 const updateCategory = authedProcedure
-  .input(CategorySchema.pick({ id: true, name: true, importPatterns: true }))
+  .input(
+    CategorySchema.pick({
+      id: true,
+      name: true,
+      color: true,
+      importPatterns: true,
+    }),
+  )
   .output(CategorySchema)
-  .mutation(async ({ ctx, input: { id, name, importPatterns } }) => {
+  .mutation(async ({ ctx, input: { id, name, color, importPatterns } }) => {
     const userId = ctx.user?.id;
     if (!userId) {
       throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
     return await db
       .updateTable('category')
-      .set({ name, importPatterns: JSON.stringify(importPatterns) })
+      .set({ name, color, importPatterns: JSON.stringify(importPatterns) })
       .where('userId', '=', userId)
       .where('id', '=', id)
       .returningAll()

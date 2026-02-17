@@ -20,6 +20,7 @@ import { Button } from './ui/button';
 export type Option = {
   label: string;
   value: string;
+  keywords?: string[];
 };
 
 type Props = {
@@ -73,13 +74,19 @@ export default function Combobox({
       >
         <Command>
           <CommandInput placeholder={placeholder} className="h-9" />
-          <CommandList>
+          <CommandList
+            className="max-h-72 overflow-y-auto overscroll-contain"
+            onWheelCapture={(event) => {
+              event.stopPropagation();
+            }}
+          >
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
                   value={option.value}
+                  keywords={option.keywords}
                   onSelect={(currentValue) => {
                     onChange(currentValue === value ? '' : currentValue);
                     setOpen(false);
