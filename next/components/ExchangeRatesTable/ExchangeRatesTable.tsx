@@ -19,6 +19,8 @@ export default function ExchangeRatesTable({ rates }: Props) {
       sorting={sorting}
       onSortingChange={onSortingChange}
       globalFilter={globalFilter}
+      virtualized
+      rowHeightEstimate={44}
     />
   );
 }
