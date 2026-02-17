@@ -21,7 +21,7 @@ export default function CSVImportPresetListItem({
 }: Props) {
   return (
     <Card className="flex-row items-center border border-border py-0 ring-0">
-      <CardContent className="flex flex-1 min-w-0 items-center gap-3 py-3">
+      <CardContent className="flex flex-1 min-w-0 items-center gap-3 py-1">
         <Avatar>
           <AvatarFallback>
             <FileUp className="size-4" />

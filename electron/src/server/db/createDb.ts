@@ -1,8 +1,8 @@
-import path from 'path';
+import path from 'node:path';
+import logger from '@server/logger';
+import { ensureFolderExistsSync } from '@server/utils';
 import SQLite from 'better-sqlite3';
 import { Kysely, ParseJSONResultsPlugin, SqliteDialect } from 'kysely';
-import { ensureFolderExistsSync } from '@server/utils';
-import logger from '@server/logger';
 import type { Database } from './types';
 
 export default function createDb(dbPath: string) {
@@ -16,7 +16,7 @@ export default function createDb(dbPath: string) {
     plugins: [new ParseJSONResultsPlugin()],
     log(event) {
       if (event.level === 'error') {
-        console.error(
+        logger.error(
           `Query failed (Writer) : ${JSON.stringify(
             {
               durationMs: event.queryDurationMillis,

@@ -71,7 +71,7 @@ export default function CSVImportPresetList({ presets }: Props) {
 
   return (
     <>
-      <ul className="m-0 list-none space-y-3 p-0">
+      <ul className="m-0 list-none space-y-2 p-0">
         {presets.map((preset) => (
           <li key={preset.id}>
             <CSVImportPresetListItem
