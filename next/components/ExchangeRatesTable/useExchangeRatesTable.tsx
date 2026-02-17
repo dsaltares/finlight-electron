@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRateFilter } from '@/hooks/useFilters';
 import useSortFromUrl from '@/hooks/useSortFromUrl';
 import flags from '@/lib/flags';
-import { formatDate } from '@/lib/format';
+import { formatCurrencyValue, formatDate } from '@/lib/format';
 import type { ExchangeRate } from '@/server/trpc/procedures/exchangeRates';
 
 export const DefaultSort: ColumnSort = { id: 'ticker', desc: true };
@@ -88,7 +88,7 @@ export default function useExchangeRatesTable(rates: ExchangeRate[]): {
         ),
         cell: (info) => (
           <span className="text-right text-sm tabular-nums">
-            {info.getValue() ?? 1.0} {info.row.original.code}
+            {formatCurrencyValue(info.getValue() ?? 1.0)} {info.row.original.code}
           </span>
         ),
         meta: { align: 'right' as const },
