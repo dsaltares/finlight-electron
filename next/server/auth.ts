@@ -1,9 +1,9 @@
 import { APIError, betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
-import { db } from './db';
+import { authDb } from './db';
 
 export const auth = betterAuth({
-  database: { db, type: 'sqlite' },
+  database: { db: authDb, type: 'sqlite' },
   trustedOrigins: [process.env.BETTER_AUTH_URL as string],
   baseURL: process.env.BETTER_AUTH_URL,
   socialProviders: {

@@ -27,6 +27,13 @@ export const db = new Kysely<DB>({
   },
 });
 
+// Better Auth expects raw string values for oauth state/verification rows.
+// ParseJSONResultsPlugin can coerce those strings into objects, which breaks
+// Better Auth's internal JSON.parse path during social callback handling.
+export const authDb = new Kysely<DB>({
+  dialect,
+});
+
 export const unknownDb = new Kysely<Record<string, never>>({
   dialect,
   plugins: [new ParseJSONResultsPlugin()],
