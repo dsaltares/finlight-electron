@@ -10,6 +10,7 @@
     "migrate": "dotenv -- tsx scripts/migrate.ts",
     "migrate:down": "dotenv -- tsx scripts/migrate.ts down",
     "migrate:to": "dotenv -- tsx scripts/migrate.ts to",
+    "importFromElectron": "dotenv -- tsx scripts/importFromElectron.ts",
     "gen-types": "dotenv -- kysely-codegen --config-file kysely-codegen.config.json"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "commander": "^14.0.3",
     "currency-codes": "^2.2.0",
     "date-fns": "^4.1.0",
     "kysely": "^0.28.11",
