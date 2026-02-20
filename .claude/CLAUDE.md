@@ -32,6 +32,7 @@ next/
     procedures/     # One file per resource (accounts, transactions, etc.)
     db.ts           # Kysely instances
     auth.ts         # Better Auth config
+    kysely.ts       # Kysely types
   migrations/       # Kysely migrations
 ```
 
