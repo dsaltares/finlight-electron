@@ -41,7 +41,7 @@ const NavItems: NavItem[] = [
   },
   {
     name: 'Transactions',
-    url: '/dashboard/transactions',
+    url: '/dashboard/transactions?period=lastMonth',
     icon: IconReceipt2,
   },
   {
@@ -79,9 +79,10 @@ const NavItems: NavItem[] = [
 export function NavMain() {
   const pathname = usePathname();
   const selectedItemUrl = useMemo(() => {
-    const matchingItems = NavItems.filter((item) =>
-      pathname.startsWith(item.url),
-    );
+    const matchingItems = NavItems.filter((item) => {
+      const itemPath = item.url.split('?')[0];
+      return pathname.startsWith(itemPath);
+    });
     const sortedItems = lodash
       .sortBy(matchingItems, (item) => item.url.length)
       .toReversed();
