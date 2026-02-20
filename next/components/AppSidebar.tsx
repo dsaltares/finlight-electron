@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { IconMoneybag } from '@tabler/icons-react';
 import Link from 'next/link';
 import type * as React from 'react';
 import { NavMain } from '@/components/NavMain';
@@ -23,23 +23,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:h-auto! data-[slot=sidebar-menu-button]:overflow-visible data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:h-auto! data-[slot=sidebar-menu-button]:overflow-visible data-[slot=sidebar-menu-button]:p-1.5! [&_svg]:size-10!"
             >
               <Link href="/" className="flex items-center gap-2">
-                <Image
-                  src="/logo-no-text.svg"
-                  alt="Finlight logo"
-                  width={48}
-                  height={48}
-                  className="dark:hidden"
-                />
-                <Image
-                  src="/logo-no-text-dark.svg"
-                  alt="Finlight logo (dark)"
-                  width={48}
-                  height={48}
-                  className="hidden dark:block"
-                />
+                <IconMoneybag className="!size-10 text-primary" />
                 <span className="text-2xl font-semibold leading-none">
                   Finlight
                 </span>
