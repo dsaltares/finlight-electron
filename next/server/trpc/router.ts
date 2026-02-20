@@ -3,6 +3,7 @@ import categoriesRouter from './procedures/categories';
 import exchangeRatesRouter from './procedures/exchangeRates';
 import importPresetsRouter from './procedures/importPresets';
 import transactionsRouter from './procedures/transactions';
+import userSettingsRouter from './procedures/userSettings';
 import { router } from './trpc';
 
 export const appRouter = router({
@@ -11,6 +12,7 @@ export const appRouter = router({
   importPresets: importPresetsRouter,
   categories: categoriesRouter,
   transactions: transactionsRouter,
+  userSettings: userSettingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

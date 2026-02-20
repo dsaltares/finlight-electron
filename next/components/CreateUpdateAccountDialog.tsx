@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import CSVImportPresetAutocomplete from '@/components/CSVImportPresetAutocomplete';
@@ -19,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import type { RouterInput, RouterOutput } from '@/lib/trpc';
+import { useTRPC } from '@/lib/trpc';
 
 type Account = RouterOutput['accounts']['list']['accounts'][number];
 
@@ -57,6 +59,10 @@ export default function CreateUpdateAccountDialog({
   onCreate,
   onUpdate,
 }: Props) {
+  const trpc = useTRPC();
+  const { data: settings } = useQuery(trpc.userSettings.get.queryOptions());
+  const defaultCurrency = settings?.defaultCurrency ?? 'EUR';
+
   const title = account ? 'Edit account' : 'Create account';
 
   const {
@@ -70,7 +76,7 @@ export default function CreateUpdateAccountDialog({
     defaultValues: {
       name: account?.name ?? '',
       initialBalance: ((account?.initialBalance ?? 0) / 100).toString(),
-      currency: currencyOptionsById[account?.currency ?? 'EUR'],
+      currency: currencyOptionsById[account?.currency ?? defaultCurrency],
       csvImportPresetId: account?.csvImportPresetId
         ? `${account.csvImportPresetId}`
         : '',
@@ -82,7 +88,7 @@ export default function CreateUpdateAccountDialog({
     reset({
       name: account?.name ?? '',
       initialBalance: ((account?.initialBalance ?? 0) / 100).toString(),
-      currency: currencyOptionsById[account?.currency ?? 'EUR'],
+      currency: currencyOptionsById[account?.currency ?? defaultCurrency],
       csvImportPresetId: account?.csvImportPresetId
         ? `${account.csvImportPresetId}`
         : '',

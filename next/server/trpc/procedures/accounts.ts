@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import z from 'zod';
 import { db } from '@/server/db';
 import { authedProcedure } from '@/server/trpc/trpc';
+import { getUserDefaultCurrency } from '@/server/trpc/procedures/userSettings';
 
 const AccountSchema = z.object({
   id: z.number(),
@@ -27,50 +28,42 @@ const ListAccountsOutputSchema = z.object({
   total: AmountSchema,
 });
 
-const BaseCurrency = 'EUR';
-
-async function getRates(currencies: string[]) {
-  const uniqueCurrencies = [...new Set(currencies)];
+async function getRates(targetCurrency: string, currencies: string[]) {
+  const allCurrencies = [...new Set([...currencies, targetCurrency])];
   const rates = await Promise.all(
-    uniqueCurrencies.map(async (currency) => {
-      if (currency === BaseCurrency) {
-        return { currency, rateInCents: 100 };
+    allCurrencies.map(async (currency) => {
+      if (currency === 'EUR') {
+        return { currency, rate: 1 };
       }
-      const rate = await db
+      const row = await db
         .selectFrom('exchange_rate')
         .select(['close'])
-        .where('ticker', '=', `${BaseCurrency}${currency}`)
+        .where('ticker', '=', `EUR${currency}`)
         .orderBy('date', 'desc')
         .executeTakeFirst();
-      return {
-        currency,
-        // Store rate as cent-scaled integer (e.g. 1.23 -> 123).
-        rateInCents: Math.round((rate?.close ?? 1) * 100),
-      };
+      return { currency, rate: row?.close ?? 1 };
     }),
   );
 
   return rates.reduce<Record<string, number>>(
-    (acc, { currency, rateInCents }) => {
-      acc[currency] = rateInCents;
+    (acc, { currency, rate }) => {
+      acc[currency] = rate;
       return acc;
     },
     {},
   );
 }
 
-function convertAmountFromCents(
+function convertAmount(
   amountInCents: number,
   currency: string,
   targetCurrency: string,
   rates: Record<string, number>,
 ) {
-  const baseToTargetRateInCents = rates[targetCurrency] ?? 100;
-  const baseToTransactionRateInCents = rates[currency] ?? 100;
-  // Keep conversion in cent units end-to-end.
-  return Math.round(
-    (amountInCents * baseToTargetRateInCents) / baseToTransactionRateInCents,
-  );
+  if (currency === targetCurrency) return amountInCents;
+  const eurToTarget = rates[targetCurrency] ?? 1;
+  const eurToSource = rates[currency] ?? 1;
+  return Math.round((amountInCents * eurToTarget) / eurToSource);
 }
 
 const listAccounts = authedProcedure
@@ -88,16 +81,15 @@ const listAccounts = authedProcedure
       .orderBy('createdAt', 'asc')
       .execute();
 
-    const rates = await getRates(accounts.map((account) => account.currency));
+    const baseCurrency = await getUserDefaultCurrency(ctx.user.id);
+    const rates = await getRates(
+      baseCurrency,
+      accounts.map((account) => account.currency),
+    );
     const total = accounts.reduce(
       (sum, account) =>
         sum +
-        convertAmountFromCents(
-          account.balance,
-          account.currency,
-          BaseCurrency,
-          rates,
-        ),
+        convertAmount(account.balance, account.currency, baseCurrency, rates),
       0,
     );
 
@@ -105,7 +97,7 @@ const listAccounts = authedProcedure
       accounts,
       total: {
         value: total,
-        currency: BaseCurrency,
+        currency: baseCurrency,
       },
     };
   });

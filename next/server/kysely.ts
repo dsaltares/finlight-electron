@@ -79,7 +79,7 @@ export interface BudgetEntry {
 }
 
 export interface Category {
-  color: string;
+  color: Generated<string>;
   createdAt: Generated<string>;
   deletedAt: string | null;
   id: Generated<number>;
@@ -137,6 +137,14 @@ export interface User {
   updatedAt: Generated<string>;
 }
 
+export interface UserSettings {
+  createdAt: Generated<string>;
+  id: Generated<number>;
+  settings: Generated<string>;
+  updatedAt: Generated<string>;
+  userId: string;
+}
+
 export interface Verification {
   createdAt: Generated<string>;
   expiresAt: string;
@@ -158,5 +166,6 @@ export interface DB {
   exchange_rate: ExchangeRate;
   session: Session;
   user: User;
+  user_settings: UserSettings;
   verification: Verification;
 }
