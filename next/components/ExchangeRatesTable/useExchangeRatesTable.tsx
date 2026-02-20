@@ -88,7 +88,8 @@ export default function useExchangeRatesTable(rates: ExchangeRate[]): {
         ),
         cell: (info) => (
           <span className="text-right text-sm tabular-nums">
-            {formatCurrencyValue(info.getValue() ?? 1.0)} {info.row.original.code}
+            {formatCurrencyValue(info.getValue() ?? 1.0)}{' '}
+            {info.row.original.code}
           </span>
         ),
         meta: { align: 'right' as const },

@@ -137,7 +137,10 @@ export default function CreateUpdateAccountDialog({
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="account-name">Name</Label>
-            <Input id="account-name" {...register('name', { required: true })} />
+            <Input
+              id="account-name"
+              {...register('name', { required: true })}
+            />
           </div>
 
           <div className="flex flex-col gap-1">
@@ -171,7 +174,10 @@ export default function CreateUpdateAccountDialog({
               name="csvImportPresetId"
               render={({ field: { value, onChange } }) => (
                 <div id="account-preset">
-                  <CSVImportPresetAutocomplete value={value} onChange={onChange} />
+                  <CSVImportPresetAutocomplete
+                    value={value}
+                    onChange={onChange}
+                  />
                 </div>
               )}
             />

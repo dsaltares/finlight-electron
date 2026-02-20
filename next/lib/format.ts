@@ -9,7 +9,10 @@ export function formatCurrencyValue(value: number) {
   return value.toFixed(4);
 }
 
-export function formatAmount(amountInCents: number, currency: string | undefined) {
+export function formatAmount(
+  amountInCents: number,
+  currency: string | undefined,
+) {
   if (Number.isNaN(amountInCents)) {
     return '-';
   }

@@ -59,8 +59,8 @@ const listTransactions = authedProcedure
       }
       let query = await db
         .selectFrom('account_transaction as t')
-        .selectAll()
         .innerJoin('bank_account', 't.accountId', 'bank_account.id')
+        .selectAll('t')
         .where('bank_account.userId', '=', userId)
         .where('t.deletedAt', 'is', null);
 
@@ -203,13 +203,20 @@ const updateTransaction = authedProcedure
     const existing = await db
       .selectFrom('account_transaction')
       .select('accountId')
-      .innerJoin('bank_account', 'account_transaction.accountId', 'bank_account.id')
+      .innerJoin(
+        'bank_account',
+        'account_transaction.accountId',
+        'bank_account.id',
+      )
       .where('bank_account.userId', '=', userId)
       .where('account_transaction.id', '=', id)
       .where('account_transaction.deletedAt', 'is', null)
       .executeTakeFirst();
     if (!existing) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Transaction not found' });
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Transaction not found',
+      });
     }
     const transaction = await db
       .updateTable('account_transaction')
@@ -220,6 +227,57 @@ const updateTransaction = authedProcedure
       .executeTakeFirstOrThrow();
     await updateAccountBalance(existing.accountId);
     return transaction;
+  });
+
+const updateManyTransactions = authedProcedure
+  .input(
+    TransactionSchema.pick({
+      amount: true,
+      date: true,
+      description: true,
+      type: true,
+      categoryId: true,
+    })
+      .partial()
+      .extend({ ids: z.number().array().min(1) }),
+  )
+  .output(z.number())
+  .mutation(async ({ ctx, input: { ids, ...fields } }) => {
+    const userId = ctx.user?.id;
+    if (!userId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    const owned = await db
+      .selectFrom('account_transaction')
+      .select(['account_transaction.id', 'account_transaction.accountId'])
+      .innerJoin(
+        'bank_account',
+        'account_transaction.accountId',
+        'bank_account.id',
+      )
+      .where('bank_account.userId', '=', userId)
+      .where('account_transaction.id', 'in', ids)
+      .where('account_transaction.deletedAt', 'is', null)
+      .execute();
+    if (owned.length !== ids.length) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'One or more transactions not found',
+      });
+    }
+    if (Object.keys(fields).length === 0) {
+      return 0;
+    }
+    await db
+      .updateTable('account_transaction')
+      .set(fields)
+      .where('id', 'in', ids)
+      .execute();
+    const affectedAccountIds = [...new Set(owned.map((row) => row.accountId))];
+    await Promise.all(
+      affectedAccountIds.map((accountId) => updateAccountBalance(accountId)),
+    );
+    return owned.length;
   });
 
 const deleteTransaction = authedProcedure
@@ -233,13 +291,20 @@ const deleteTransaction = authedProcedure
     const existing = await db
       .selectFrom('account_transaction')
       .select('accountId')
-      .innerJoin('bank_account', 'account_transaction.accountId', 'bank_account.id')
+      .innerJoin(
+        'bank_account',
+        'account_transaction.accountId',
+        'bank_account.id',
+      )
       .where('bank_account.userId', '=', userId)
       .where('account_transaction.id', '=', id)
       .where('account_transaction.deletedAt', 'is', null)
       .executeTakeFirst();
     if (!existing) {
-      throw new TRPCError({ code: 'NOT_FOUND', message: 'Transaction not found' });
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Transaction not found',
+      });
     }
     await db
       .updateTable('account_transaction')
@@ -254,5 +319,6 @@ export default {
   create: createTransaction,
   createMany: createTransactions,
   update: updateTransaction,
+  updateMany: updateManyTransactions,
   delete: deleteTransaction,
 };

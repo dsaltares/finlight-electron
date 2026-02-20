@@ -10,7 +10,12 @@ const colorOptions: Option[] = CategoryColorHexValues.map((hex) => {
   return {
     value: color.hex,
     label: `${color.name} (${color.hex})`,
-    keywords: [color.name, color.hex, color.name.toLowerCase(), color.hex.toLowerCase()],
+    keywords: [
+      color.name,
+      color.hex,
+      color.name.toLowerCase(),
+      color.hex.toLowerCase(),
+    ],
   };
 });
 

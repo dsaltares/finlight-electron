@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import {
@@ -87,18 +87,13 @@ export default function Combobox({
                   key={option.value}
                   value={option.value}
                   keywords={option.keywords}
+                  data-checked={value === option.value || undefined}
                   onSelect={(currentValue) => {
                     onChange(currentValue === value ? '' : currentValue);
                     setOpen(false);
                   }}
                 >
                   {renderOption ? renderOption(option) : option.label}
-                  <Check
-                    className={cn(
-                      'ml-auto shrink-0',
-                      value === option.value ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -84,7 +84,10 @@ interface SourceDB {
 
 const logger = getLogger('importFromElectron');
 
-function parseArrayField<T>(value: T[] | string | null | undefined, fallback: T[]): T[] {
+function parseArrayField<T>(
+  value: T[] | string | null | undefined,
+  fallback: T[],
+): T[] {
   if (Array.isArray(value)) {
     return value;
   }
@@ -152,37 +155,45 @@ async function run() {
   logger.info({ sqlitePath, userEmail }, 'Starting Electron data import');
 
   try {
-    const [sourcePresets, sourceAccounts, sourceCategories, sourceTransactions] =
-      await Promise.all([
-        sourceDb
-          .selectFrom('csvImportPreset')
-          .selectAll()
-          .where('deletedAt', 'is', null)
-          .orderBy('id', 'asc')
-          .execute(),
-        sourceDb
-          .selectFrom('bankAccount')
-          .selectAll()
-          .where('deletedAt', 'is', null)
-          .orderBy('id', 'asc')
-          .execute(),
-        sourceDb
-          .selectFrom('category')
-          .selectAll()
-          .where('deletedAt', 'is', null)
-          .orderBy('id', 'asc')
-          .execute(),
-        sourceDb
-          .selectFrom('accountTransaction')
-          .selectAll()
-          .where('deletedAt', 'is', null)
-          .orderBy('id', 'asc')
-          .execute(),
-      ]);
+    const [
+      sourcePresets,
+      sourceAccounts,
+      sourceCategories,
+      sourceTransactions,
+    ] = await Promise.all([
+      sourceDb
+        .selectFrom('csvImportPreset')
+        .selectAll()
+        .where('deletedAt', 'is', null)
+        .orderBy('id', 'asc')
+        .execute(),
+      sourceDb
+        .selectFrom('bankAccount')
+        .selectAll()
+        .where('deletedAt', 'is', null)
+        .orderBy('id', 'asc')
+        .execute(),
+      sourceDb
+        .selectFrom('category')
+        .selectAll()
+        .where('deletedAt', 'is', null)
+        .orderBy('id', 'asc')
+        .execute(),
+      sourceDb
+        .selectFrom('accountTransaction')
+        .selectAll()
+        .where('deletedAt', 'is', null)
+        .orderBy('id', 'asc')
+        .execute(),
+    ]);
 
     const [sourceBudgets, sourceBudgetEntries] = await Promise.all([
       sourceDb.selectFrom('budget').selectAll().orderBy('id', 'asc').execute(),
-      sourceDb.selectFrom('budgetEntry').selectAll().orderBy('id', 'asc').execute(),
+      sourceDb
+        .selectFrom('budgetEntry')
+        .selectAll()
+        .orderBy('id', 'asc')
+        .execute(),
     ]);
 
     await db.transaction().execute(async (trx) => {
@@ -246,7 +257,10 @@ async function run() {
       }
 
       await trx.deleteFrom('budget').where('userId', '=', userId).execute();
-      await trx.deleteFrom('bank_account').where('userId', '=', userId).execute();
+      await trx
+        .deleteFrom('bank_account')
+        .where('userId', '=', userId)
+        .execute();
       await trx.deleteFrom('category').where('userId', '=', userId).execute();
       await trx
         .deleteFrom('csv_import_preset')
@@ -334,7 +348,10 @@ async function run() {
         .filter((row): row is NonNullable<typeof row> => row !== null);
 
       if (transactionRows.length > 0) {
-        await trx.insertInto('account_transaction').values(transactionRows).execute();
+        await trx
+          .insertInto('account_transaction')
+          .values(transactionRows)
+          .execute();
       }
 
       const budgetIdMap = new Map<number, number>();

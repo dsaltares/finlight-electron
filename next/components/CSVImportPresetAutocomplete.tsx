@@ -13,7 +13,10 @@ type Props = {
   onChange: (value: string) => void;
 };
 
-export default function CSVImportPresetAutocomplete({ value, onChange }: Props) {
+export default function CSVImportPresetAutocomplete({
+  value,
+  onChange,
+}: Props) {
   const trpc = useTRPC();
   const { data: presets, isLoading } = useQuery(
     trpc.importPresets.list.queryOptions(),
