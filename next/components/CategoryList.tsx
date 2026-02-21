@@ -73,7 +73,7 @@ export default function CategoryList({ categories }: Props) {
 
   return (
     <>
-      <ul className="m-0 list-none space-y-2 p-0">
+      <ul className="m-0 min-h-0 flex-1 list-none space-y-2 overflow-y-auto p-0">
         {categories.map((category) => (
           <li key={category.id}>
             <CategoryListItem

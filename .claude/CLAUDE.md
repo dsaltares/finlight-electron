@@ -45,6 +45,7 @@ next/
 - **Utilities:** camelCase filenames, named exports
 - **DB tables:** snake_case (`bank_account`), fields are camelCase (`createdAt`)
 - **No console statements** — use Pino logger on server (`server/logger.ts`)
+- **Function arguments**: functions can take max 2 arguments. If you need more, pass a single object with named properties. Define the type as FunctionNameArgs right above the function.
 
 ## tRPC Procedures
 

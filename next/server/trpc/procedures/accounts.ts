@@ -45,13 +45,10 @@ async function getRates(targetCurrency: string, currencies: string[]) {
     }),
   );
 
-  return rates.reduce<Record<string, number>>(
-    (acc, { currency, rate }) => {
-      acc[currency] = rate;
-      return acc;
-    },
-    {},
-  );
+  return rates.reduce<Record<string, number>>((acc, { currency, rate }) => {
+    acc[currency] = rate;
+    return acc;
+  }, {});
 }
 
 function convertAmount(
