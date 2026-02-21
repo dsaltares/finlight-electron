@@ -2,8 +2,8 @@
 
 import { IconAdjustments } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Loader2, Save, Search } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Check, Loader2, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BudgetOptionsDialog from '@/components/BudgetOptionsDialog';
 import BudgetTable, { type BudgetEntry } from '@/components/BudgetTable';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,10 @@ export default function BudgetPage() {
   const { queryInput, displayCurrency, filterCount } = useBudgetFilters();
   const [search, setSearch] = useState('');
   const [localEntries, setLocalEntries] = useState<BudgetEntry[] | null>(null);
+  const [showSaved, setShowSaved] = useState(false);
+  const isDirtyRef = useRef(false);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const savedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const { data, isLoading } = useQuery(
     trpc.budget.get.queryOptions(queryInput),
@@ -40,6 +44,7 @@ export default function BudgetPage() {
   useEffect(() => {
     if (data) {
       setLocalEntries(data.entries);
+      isDirtyRef.current = false;
     }
   }, [data]);
 
@@ -54,26 +59,14 @@ export default function BudgetPage() {
     trpc.budget.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.budget.get.queryKey() });
-        toast.success('Budget saved');
+        setShowSaved(true);
+        clearTimeout(savedTimeoutRef.current);
+        savedTimeoutRef.current = setTimeout(() => setShowSaved(false), 2000);
       },
       onError: () => {
         toast.error('Failed to save budget');
       },
     }),
-  );
-
-  const handleUpdateEntry = useCallback(
-    ({ categoryId, field, value }: { categoryId: number; field: 'type' | 'target'; value: string | number }) => {
-      setLocalEntries((prev) => {
-        if (!prev) return prev;
-        return prev.map((e) => {
-          if (e.categoryId !== categoryId) return e;
-          if (field === 'type') return { ...e, type: value as 'Income' | 'Expense' };
-          return { ...e, target: value as number };
-        });
-      });
-    },
-    [],
   );
 
   const handleSave = useCallback(() => {
@@ -87,6 +80,31 @@ export default function BudgetPage() {
       })),
     });
   }, [save, queryInput.granularity, data?.granularity, displayCurrency, entries]);
+
+  const handleUpdateEntry = useCallback(
+    ({ categoryId, field, value }: { categoryId: number; field: 'type' | 'target'; value: string | number }) => {
+      setLocalEntries((prev) => {
+        if (!prev) return prev;
+        return prev.map((e) => {
+          if (e.categoryId !== categoryId) return e;
+          if (field === 'type') return { ...e, type: value as 'Income' | 'Expense' };
+          return { ...e, target: value as number };
+        });
+      });
+      isDirtyRef.current = true;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!isDirtyRef.current) return;
+    clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      handleSave();
+      isDirtyRef.current = false;
+    }, 1000);
+    return () => clearTimeout(saveTimeoutRef.current);
+  }, [localEntries, handleSave]);
 
   return (
     <div
@@ -106,24 +124,14 @@ export default function BudgetPage() {
             className="pl-8"
           />
         </div>
+        <div className="flex size-5 shrink-0 items-center justify-center">
+          {isSaving ? (
+            <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+          ) : showSaved ? (
+            <Check className="size-3.5 text-muted-foreground" />
+          ) : null}
+        </div>
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <Save className="size-5" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Save budget</TooltipContent>
-          </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
