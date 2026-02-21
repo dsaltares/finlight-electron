@@ -24,11 +24,16 @@ export type Category = z.infer<typeof CategorySchema>;
 const listCategories = authedProcedure
   .input(z.void())
   .output(z.array(CategorySchema))
-  .query(async () => {
+  .query(async ({ ctx }) => {
+    const userId = ctx.user?.id;
+    if (!userId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
     return await db
       .selectFrom('category')
       .selectAll()
       .where('deletedAt', 'is', null)
+      .where('userId', '=', userId)
       .execute();
   });
 

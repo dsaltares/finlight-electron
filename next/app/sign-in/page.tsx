@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import GoogleIcon from '@/components/icons/google';
 import authClient from '@/lib/authClient';
+import { logger } from '@/server/logger';
 
 export default function SignInPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -14,7 +15,7 @@ export default function SignInPage() {
       await authClient.signIn.social({ provider: 'google' });
     } catch (error) {
       setIsSigningIn(false);
-      console.error('Google sign-in failed', error);
+      logger.error({ error }, 'Google sign-in failed');
     }
   };
 
