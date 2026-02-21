@@ -46,6 +46,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   sorting?: SortingState;
+  initialSorting?: SortingState;
   onSortingChange?: OnChangeFn<SortingState>;
   globalFilter?: string;
   virtualized?: boolean;
@@ -60,6 +61,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   sorting: externalSorting,
+  initialSorting,
   onSortingChange: externalOnSortingChange,
   globalFilter,
   virtualized = false,
@@ -69,7 +71,7 @@ export function DataTable<TData, TValue>({
   tableClassName,
   wrapperClassName,
 }: DataTableProps<TData, TValue>) {
-  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const [internalSorting, setInternalSorting] = useState<SortingState>(initialSorting ?? []);
   const sorting = externalSorting ?? internalSorting;
   const onSortingChange = externalOnSortingChange ?? setInternalSorting;
 

@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { type ColumnMeta, DataTable } from '@/components/DataTable';
+import useSortFromUrl from '@/hooks/useSortFromUrl';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -50,6 +51,8 @@ export default function BudgetTable({
   currency,
   search,
 }: Props) {
+  const { sorting, onSortingChange } = useSortFromUrl({ id: 'type', desc: true });
+
   const filtered = useMemo(() => {
     if (!search) return entries;
     const lower = search.toLowerCase();
@@ -208,6 +211,8 @@ export default function BudgetTable({
     <DataTable
       columns={columns}
       data={filtered}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
       pinnedContent={pinnedContent}
       wrapperClassName="h-full"
     />

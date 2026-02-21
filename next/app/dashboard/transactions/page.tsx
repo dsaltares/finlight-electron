@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   Trash2,
 } from 'lucide-react';
+import { useQueryState } from 'nuqs';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import BulkEditTransactionsDialog from '@/components/BulkEditTransactionsDialog';
@@ -33,7 +34,7 @@ import { useTRPC } from '@/lib/trpc';
 
 export default function TransactionsPage() {
   const trpc = useTRPC();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('q', { defaultValue: '' });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const { queryInput, hasFilters, clearFilters } = useTransactionFilters();
 

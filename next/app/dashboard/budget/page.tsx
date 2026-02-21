@@ -3,6 +3,7 @@
 import { IconAdjustments } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Loader2, Search } from 'lucide-react';
+import { useQueryState } from 'nuqs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BudgetOptionsDialog from '@/components/BudgetOptionsDialog';
 import BudgetTable, { type BudgetEntry } from '@/components/BudgetTable';
@@ -30,7 +31,7 @@ export default function BudgetPage() {
     onClose: onSettingsClose,
   } = useDialog();
   const { queryInput, displayCurrency, filterCount } = useBudgetFilters();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('q', { defaultValue: '' });
   const [localEntries, setLocalEntries] = useState<BudgetEntry[] | null>(null);
   const [showSaved, setShowSaved] = useState(false);
   const isDirtyRef = useRef(false);
@@ -104,7 +105,7 @@ export default function BudgetPage() {
       isDirtyRef.current = false;
     }, 1000);
     return () => clearTimeout(saveTimeoutRef.current);
-  }, [localEntries, handleSave]);
+  }, [handleSave]);
 
   return (
     <div

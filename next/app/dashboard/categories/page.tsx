@@ -2,7 +2,8 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Plus, Tag } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useQueryState } from 'nuqs';
+import { useMemo } from 'react';
 import { toast } from 'sonner';
 import CategoryList from '@/components/CategoryList';
 import CreateUpdateCategoryDialog from '@/components/CreateUpdateCategoryDialog';
@@ -15,7 +16,7 @@ import { useTRPC } from '@/lib/trpc';
 
 export default function CategoriesPage() {
   const trpc = useTRPC();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useQueryState('q', { defaultValue: '' });
   const { data: categories, isLoading } = useQuery(
     trpc.categories.list.queryOptions(),
   );
