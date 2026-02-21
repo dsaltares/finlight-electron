@@ -1,5 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
 export default function DashboardPage() {
-  return <div className="flex flex-col gap-4 h-full">Hello</div>;
+  redirect('/dashboard/accounts');
 }
