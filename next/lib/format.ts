@@ -5,6 +5,19 @@ export function formatDate(date: Date | string) {
   return format(d, 'dd MMMM yyyy');
 }
 
+export function formatDateWithGranularity(date: Date | string, granularity: string) {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const fmt =
+    granularity === 'Daily'
+      ? 'dd MMMM yyyy'
+      : granularity === 'Monthly'
+        ? 'MMMM yyyy'
+        : granularity === 'Quarterly'
+          ? 'qqq yyyy'
+          : 'yyyy';
+  return format(d, fmt);
+}
+
 export function formatCurrencyValue(value: number) {
   return value.toFixed(4);
 }

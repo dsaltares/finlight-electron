@@ -3,7 +3,7 @@
 import { IconAdjustments } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Save, Search } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import BudgetOptionsDialog from '@/components/BudgetOptionsDialog';
 import BudgetTable, { type BudgetEntry } from '@/components/BudgetTable';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/tooltip';
 import useDialog from '@/hooks/use-dialog';
 import useBudgetFilters from '@/hooks/useBudgetFilters';
+import { formatDateWithGranularity } from '@/lib/format';
 import { useTRPC } from '@/lib/trpc';
 import { toast } from 'sonner';
 
@@ -43,6 +44,11 @@ export default function BudgetPage() {
   }, [data]);
 
   const entries = localEntries ?? data?.entries ?? [];
+
+  const periodLabel = useMemo(() => {
+    const granularity = queryInput.granularity || data?.granularity || 'Monthly';
+    return formatDateWithGranularity(new Date(), granularity);
+  }, [queryInput.granularity, data?.granularity]);
 
   const { mutate: save, isPending: isSaving } = useMutation(
     trpc.budget.update.mutationOptions({
@@ -90,6 +96,7 @@ export default function BudgetPage() {
       }}
     >
       <div className="flex shrink-0 flex-row items-center gap-2">
+        <span className="shrink-0 text-sm font-medium">{periodLabel}</span>
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
