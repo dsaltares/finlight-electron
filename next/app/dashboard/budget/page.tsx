@@ -78,7 +78,7 @@ export default function BudgetPage() {
 
   const handleSave = useCallback(() => {
     save({
-      granularity: queryInput.granularity,
+      granularity: queryInput.granularity ?? data?.granularity,
       currency: displayCurrency,
       entries: entries.map((e) => ({
         categoryId: e.categoryId,
@@ -86,7 +86,7 @@ export default function BudgetPage() {
         target: e.target,
       })),
     });
-  }, [save, queryInput.granularity, displayCurrency, entries]);
+  }, [save, queryInput.granularity, data?.granularity, displayCurrency, entries]);
 
   return (
     <div

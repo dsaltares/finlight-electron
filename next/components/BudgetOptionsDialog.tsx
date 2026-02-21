@@ -51,8 +51,7 @@ export default function BudgetOptionsDialog({ open, onClose }: Props) {
       period: period || null,
       dateFrom: dateFrom || null,
       dateUntil: dateUntil || null,
-      granularity:
-        granularity && granularity !== 'Monthly' ? granularity : null,
+      granularity: granularity || null,
       currency:
         currency.value && currency.value !== displayCurrency
           ? currency.value
