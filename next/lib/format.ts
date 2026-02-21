@@ -9,6 +9,15 @@ export function formatCurrencyValue(value: number) {
   return value.toFixed(4);
 }
 
+export function formatPercentage(value: number) {
+  if (!Number.isFinite(value)) return '-';
+  return new Intl.NumberFormat(undefined, {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 export function formatAmount(
   amountInCents: number,
   currency: string | undefined,
