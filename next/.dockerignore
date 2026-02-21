@@ -1,0 +1,9 @@
+node_modules
+.next
+.env*
+data/
+.git
+*.md
+.biome
+biome.json
+kysely-codegen.config.json

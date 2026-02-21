@@ -1,28 +1,15 @@
-import { promises as fs } from 'node:fs';
-import path from 'node:path';
-import { FileMigrationProvider, Migrator } from 'kysely';
-import { unknownDb } from '@/server/db';
 import { getLogger } from '@/server/logger';
+import { createMigrator, migrateToLatest } from '@/server/migrate';
 
 const logger = getLogger('migrate');
 
 async function run() {
-  const migrationsFolder = path.resolve(process.cwd(), 'migrations');
-
-  const migrator = new Migrator({
-    db: unknownDb,
-    provider: new FileMigrationProvider({
-      fs,
-      path,
-      migrationFolder: migrationsFolder,
-    }),
-  });
-
   const direction =
     (process.argv[2] as 'up' | 'down' | 'latest' | 'to' | undefined) ??
     'latest';
 
   if (direction === 'down') {
+    const migrator = createMigrator();
     const result = await migrator.migrateDown();
     if (result.error) throw result.error;
     for (const m of result.results ?? [])
@@ -36,6 +23,7 @@ async function run() {
     if (!target) {
       throw new Error('Usage: migrate to <migration_name>');
     }
+    const migrator = createMigrator();
     const result = await migrator.migrateTo(target);
     if (result.error) throw result.error;
     for (const m of result.results ?? []) {
@@ -45,12 +33,7 @@ async function run() {
     return;
   }
 
-  const result = await migrator.migrateToLatest();
-  if (result.error) throw result.error;
-  for (const m of result.results ?? []) {
-    logger.info(`⬆️ applied: ${m.migrationName}`);
-  }
-  logger.info('✅ migration up-to-date');
+  await migrateToLatest();
 }
 
 run()
