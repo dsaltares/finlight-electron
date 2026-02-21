@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import GoogleIcon from '@/components/icons/google';
 import authClient from '@/lib/authClient';
-import { logger } from '@/server/logger';
 
 export default function SignInPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -15,7 +15,9 @@ export default function SignInPage() {
       await authClient.signIn.social({ provider: 'google' });
     } catch (error) {
       setIsSigningIn(false);
-      logger.error({ error }, 'Google sign-in failed');
+      toast.error('Failed to sign in with Google', {
+        description: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   };
 
