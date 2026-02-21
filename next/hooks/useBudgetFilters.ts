@@ -1,21 +1,45 @@
 import { useQuery } from '@tanstack/react-query';
+import {
+  endOfMonth,
+  endOfQuarter,
+  endOfYear,
+  format,
+  startOfMonth,
+  startOfQuarter,
+  startOfYear,
+  subQuarters,
+} from 'date-fns';
 import { parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useMemo } from 'react';
 import { useTRPC } from '@/lib/trpc';
-import type {
-  DateFilter,
-  Period,
-  TimeGranularity,
-} from '@/server/trpc/procedures/schema';
-import { PeriodSchema } from '@/server/trpc/procedures/schema';
+import type { TimeGranularity } from '@/server/trpc/procedures/schema';
 
 const filterParsers = {
-  period: parseAsString,
-  dateFrom: parseAsString,
-  dateUntil: parseAsString,
+  date: parseAsString,
   granularity: parseAsString,
   currency: parseAsString,
 };
+
+function getDateRange(date: string, granularity: string) {
+  const d = new Date(date);
+  switch (granularity) {
+    case 'Yearly':
+      return {
+        from: format(startOfYear(d), 'yyyy-MM-dd'),
+        until: format(endOfYear(d), 'yyyy-MM-dd'),
+      };
+    case 'Quarterly':
+      return {
+        from: format(startOfQuarter(d), 'yyyy-MM-dd'),
+        until: format(endOfQuarter(d), 'yyyy-MM-dd'),
+      };
+    default:
+      return {
+        from: format(startOfMonth(d), 'yyyy-MM-dd'),
+        until: format(endOfMonth(d), 'yyyy-MM-dd'),
+      };
+  }
+}
 
 export default function useBudgetFilters() {
   const trpc = useTRPC();
@@ -25,33 +49,24 @@ export default function useBudgetFilters() {
   const displayCurrency =
     filters.currency ?? userSettings?.defaultCurrency ?? 'EUR';
 
-  const dateFilter = useMemo((): DateFilter | undefined => {
-    if (filters.period && PeriodSchema.safeParse(filters.period).success) {
-      return filters.period as Period;
-    }
-    if (filters.dateFrom || filters.dateUntil) {
-      return {
-        from: filters.dateFrom ?? undefined,
-        until: filters.dateUntil ?? undefined,
-      };
-    }
-    return undefined;
-  }, [filters.period, filters.dateFrom, filters.dateUntil]);
+  const granularity = (filters.granularity as TimeGranularity) ?? 'Quarterly';
+  const selectedDate =
+    filters.date ??
+    format(startOfQuarter(subQuarters(new Date(), 1)), 'yyyy-MM-dd');
 
-  const queryInput = useMemo(
-    () => ({
-      date: dateFilter,
+  const queryInput = useMemo(() => {
+    const range = getDateRange(selectedDate, granularity);
+    return {
+      date: range,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       currency: filters.currency ?? undefined,
-      granularity: (filters.granularity as TimeGranularity) ?? undefined,
-    }),
-    [dateFilter, filters.currency, filters.granularity],
-  );
+      granularity,
+    };
+  }, [selectedDate, granularity, filters.currency]);
 
   const filterCount = useMemo(() => {
     let count = 0;
-    if (filters.period) count++;
-    if (filters.dateFrom || filters.dateUntil) count++;
+    if (filters.date) count++;
     if (filters.granularity) count++;
     if (filters.currency) count++;
     return count;
@@ -59,9 +74,7 @@ export default function useBudgetFilters() {
 
   const applySettings = useCallback(
     (values: {
-      period: string | null;
-      dateFrom: string | null;
-      dateUntil: string | null;
+      date: string | null;
       granularity: string | null;
       currency: string | null;
     }) => setFilters(values),
@@ -71,9 +84,7 @@ export default function useBudgetFilters() {
   const clearSettings = useCallback(
     () =>
       setFilters({
-        period: null,
-        dateFrom: null,
-        dateUntil: null,
+        date: null,
         granularity: null,
         currency: null,
       }),
@@ -84,6 +95,7 @@ export default function useBudgetFilters() {
     filters,
     queryInput,
     displayCurrency,
+    selectedDate,
     filterCount,
     applySettings,
     clearSettings,

@@ -5,7 +5,10 @@ export function formatDate(date: Date | string) {
   return format(d, 'dd MMMM yyyy');
 }
 
-export function formatDateWithGranularity(date: Date | string, granularity: string) {
+export function formatDateWithGranularity(
+  date: Date | string,
+  granularity: string,
+) {
   const d = typeof date === 'string' ? new Date(date) : date;
   const fmt =
     granularity === 'Daily'

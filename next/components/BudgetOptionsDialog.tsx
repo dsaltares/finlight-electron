@@ -23,10 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useBudgetFilters from '@/hooks/useBudgetFilters';
-import {
-  PeriodLabels,
-  TimeGranularities,
-} from '@/server/trpc/procedures/schema';
+import { TimeGranularities } from '@/server/trpc/procedures/schema';
 
 type Props = {
   open: boolean;
@@ -34,13 +31,17 @@ type Props = {
 };
 
 export default function BudgetOptionsDialog({ open, onClose }: Props) {
-  const { filters, displayCurrency, applySettings, clearSettings } =
-    useBudgetFilters();
+  const {
+    filters,
+    queryInput,
+    displayCurrency,
+    selectedDate,
+    applySettings,
+    clearSettings,
+  } = useBudgetFilters();
 
-  const [period, setPeriod] = useState(filters.period ?? '');
-  const [dateFrom, setDateFrom] = useState(filters.dateFrom ?? '');
-  const [dateUntil, setDateUntil] = useState(filters.dateUntil ?? '');
-  const [granularity, setGranularity] = useState(filters.granularity ?? '');
+  const [date, setDate] = useState(selectedDate);
+  const [granularity, setGranularity] = useState(queryInput.granularity as string);
   const [currency, setCurrency] = useState<ComboboxOption>(
     currencyOptionsById[filters.currency ?? displayCurrency] ??
       currencyOptionsById.EUR,
@@ -48,9 +49,7 @@ export default function BudgetOptionsDialog({ open, onClose }: Props) {
 
   const handleApply = () => {
     applySettings({
-      period: period || null,
-      dateFrom: dateFrom || null,
-      dateUntil: dateUntil || null,
+      date: date || null,
       granularity: granularity || null,
       currency:
         currency.value && currency.value !== displayCurrency
@@ -68,63 +67,22 @@ export default function BudgetOptionsDialog({ open, onClose }: Props) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-md">
-        <DialogTitle className="sr-only">Budget settings</DialogTitle>
+        <DialogTitle className="sr-only">Budget options</DialogTitle>
         <DialogHeader>
-          <h2 className="text-sm font-medium">Budget settings</h2>
+          <h2 className="text-sm font-medium">Budget options</h2>
         </DialogHeader>
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <Label>Period</Label>
-            <Select
-              value={period}
-              onValueChange={(v) => {
-                setPeriod(v);
-                setDateFrom('');
-                setDateUntil('');
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All time" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(PeriodLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-2">
-            <div className="flex flex-1 flex-col gap-1">
-              <Label>From</Label>
-              <Input
-                type="date"
-                value={dateFrom}
-                max={dateUntil || undefined}
-                onChange={(e) => {
-                  setDateFrom(e.target.value);
-                  setPeriod('');
-                }}
-              />
-            </div>
-            <div className="flex flex-1 flex-col gap-1">
-              <Label>Until</Label>
-              <Input
-                type="date"
-                value={dateUntil}
-                min={dateFrom || undefined}
-                onChange={(e) => {
-                  setDateUntil(e.target.value);
-                  setPeriod('');
-                }}
-              />
-            </div>
+            <Label>Date</Label>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label>Budget granularity</Label>
+            <Label>Time granularity</Label>
             <Select value={granularity} onValueChange={setGranularity}>
               <SelectTrigger>
                 <SelectValue placeholder="Monthly" />

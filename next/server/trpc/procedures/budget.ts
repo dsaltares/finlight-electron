@@ -169,9 +169,7 @@ const get = authedProcedure
     ];
     const rates = await getRates(allCurrencies);
 
-    const categoriesById = Object.fromEntries(
-      categories.map((c) => [c.id, c]),
-    );
+    const categoriesById = Object.fromEntries(categories.map((c) => [c.id, c]));
 
     const multiplier =
       outputGranularity === budget.granularity
@@ -183,8 +181,7 @@ const get = authedProcedure
       Math.abs(
         transactions
           .filter(
-            (t) =>
-              t.categoryId === categoryId && (!type || t.type === type),
+            (t) => t.categoryId === categoryId && (!type || t.type === type),
           )
           .reduce(
             (sum, t) =>
@@ -194,9 +191,7 @@ const get = authedProcedure
           ),
       );
 
-    const usedCategoryIds = new Set(
-      budget.entries.map((e) => e.categoryId),
-    );
+    const usedCategoryIds = new Set(budget.entries.map((e) => e.categoryId));
     const missingCategories = categories.filter(
       (c) => !usedCategoryIds.has(c.id),
     );

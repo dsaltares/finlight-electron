@@ -51,7 +51,10 @@ export default function BudgetTable({
   currency,
   search,
 }: Props) {
-  const { sorting, onSortingChange } = useSortFromUrl({ id: 'type', desc: true });
+  const { sorting, onSortingChange } = useSortFromUrl({
+    id: 'type',
+    desc: true,
+  });
 
   const filtered = useMemo(() => {
     if (!search) return entries;

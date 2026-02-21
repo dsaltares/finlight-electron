@@ -71,7 +71,9 @@ export function DataTable<TData, TValue>({
   tableClassName,
   wrapperClassName,
 }: DataTableProps<TData, TValue>) {
-  const [internalSorting, setInternalSorting] = useState<SortingState>(initialSorting ?? []);
+  const [internalSorting, setInternalSorting] = useState<SortingState>(
+    initialSorting ?? [],
+  );
   const sorting = externalSorting ?? internalSorting;
   const onSortingChange = externalOnSortingChange ?? setInternalSorting;
 

@@ -5,9 +5,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Check, Loader2, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import BudgetOptionsDialog from '@/components/BudgetOptionsDialog';
 import BudgetTable, { type BudgetEntry } from '@/components/BudgetTable';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,7 +20,6 @@ import useDialog from '@/hooks/use-dialog';
 import useBudgetFilters from '@/hooks/useBudgetFilters';
 import { formatDateWithGranularity } from '@/lib/format';
 import { useTRPC } from '@/lib/trpc';
-import { toast } from 'sonner';
 
 export default function BudgetPage() {
   const trpc = useTRPC();
@@ -30,7 +29,7 @@ export default function BudgetPage() {
     onOpen: onSettingsOpen,
     onClose: onSettingsClose,
   } = useDialog();
-  const { queryInput, displayCurrency, filterCount } = useBudgetFilters();
+  const { queryInput, displayCurrency, selectedDate } = useBudgetFilters();
   const [search, setSearch] = useQueryState('q', { defaultValue: '' });
   const [localEntries, setLocalEntries] = useState<BudgetEntry[] | null>(null);
   const [showSaved, setShowSaved] = useState(false);
@@ -52,9 +51,10 @@ export default function BudgetPage() {
   const entries = localEntries ?? data?.entries ?? [];
 
   const periodLabel = useMemo(() => {
-    const granularity = queryInput.granularity || data?.granularity || 'Monthly';
-    return formatDateWithGranularity(new Date(), granularity);
-  }, [queryInput.granularity, data?.granularity]);
+    const granularity =
+      queryInput.granularity || data?.granularity || 'Monthly';
+    return formatDateWithGranularity(selectedDate, granularity);
+  }, [selectedDate, queryInput.granularity, data?.granularity]);
 
   const { mutate: save, isPending: isSaving } = useMutation(
     trpc.budget.update.mutationOptions({
@@ -80,15 +80,30 @@ export default function BudgetPage() {
         target: e.target,
       })),
     });
-  }, [save, queryInput.granularity, data?.granularity, displayCurrency, entries]);
+  }, [
+    save,
+    queryInput.granularity,
+    data?.granularity,
+    displayCurrency,
+    entries,
+  ]);
 
   const handleUpdateEntry = useCallback(
-    ({ categoryId, field, value }: { categoryId: number; field: 'type' | 'target'; value: string | number }) => {
+    ({
+      categoryId,
+      field,
+      value,
+    }: {
+      categoryId: number;
+      field: 'type' | 'target';
+      value: string | number;
+    }) => {
       setLocalEntries((prev) => {
         if (!prev) return prev;
         return prev.map((e) => {
           if (e.categoryId !== categoryId) return e;
-          if (field === 'type') return { ...e, type: value as 'Income' | 'Expense' };
+          if (field === 'type')
+            return { ...e, type: value as 'Income' | 'Expense' };
           return { ...e, target: value as number };
         });
       });
@@ -142,11 +157,6 @@ export default function BudgetPage() {
                 className="relative"
               >
                 <IconAdjustments className="size-5" />
-                {filterCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 size-5 p-0 text-[10px]">
-                    {filterCount}
-                  </Badge>
-                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>Budget options</TooltipContent>
