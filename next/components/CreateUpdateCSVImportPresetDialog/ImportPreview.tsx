@@ -1,6 +1,7 @@
 'use client';
 
 import { FileUp } from 'lucide-react';
+import Papa from 'papaparse';
 import {
   type ChangeEventHandler,
   type MouseEvent,
@@ -69,11 +70,14 @@ export default function ImportPreview({ watch }: Props) {
       };
     }
     try {
-      const splitCSV = csv.split('\n');
       const start = Number.parseInt(rowsToSkipStart, 10) || 0;
       const end = Number.parseInt(rowsToSkipEnd, 10) || 0;
-      const joinedCSV = splitCSV.slice(start, splitCSV.length - end).join('\n');
-      const records = parseCSV(joinedCSV, delimiter || ',');
+      const lines = csv.split('\n');
+      const trimmed = lines.slice(start, lines.length - end).join('\n');
+      const { data: records } = Papa.parse<string[]>(trimmed, {
+        delimiter: delimiter || ',',
+        skipEmptyLines: true,
+      });
       const numCSVColumns = records[0]?.length ?? 0;
       const extraHeaders =
         fields.length < numCSVColumns
@@ -181,52 +185,6 @@ export default function ImportPreview({ watch }: Props) {
       )}
     </Card>
   );
-}
-
-function parseCSV(csv: string, delimiter: string) {
-  const rows: string[][] = [];
-  const normalized = csv.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-  for (const line of normalized.split('\n')) {
-    if (line.trim() === '') {
-      continue;
-    }
-    rows.push(parseCSVLine(line, delimiter));
-  }
-
-  return rows;
-}
-
-function parseCSVLine(line: string, delimiter: string) {
-  const fields: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index];
-    const next = line[index + 1];
-
-    if (char === '"') {
-      if (inQuotes && next === '"') {
-        current += '"';
-        index += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (char === delimiter && !inQuotes) {
-      fields.push(current);
-      current = '';
-      continue;
-    }
-
-    current += char;
-  }
-
-  fields.push(current);
-  return fields;
 }
 
 function withStableKeys<T>(values: T[]) {

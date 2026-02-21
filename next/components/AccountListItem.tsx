@@ -1,6 +1,6 @@
 'use client';
 
-import { Landmark, Pencil, Trash2 } from 'lucide-react';
+import { Landmark, Loader2, Pencil, Trash2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -11,8 +11,9 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
-import flags from '@/lib/flags';
+import useImportTransactions from '@/hooks/useImportTransactions';
 import { serializeTransactionFilters } from '@/hooks/useTransactionFilters';
+import flags from '@/lib/flags';
 import { formatAmount } from '@/lib/format';
 import type { RouterOutput } from '@/lib/trpc';
 
@@ -34,6 +35,13 @@ export default function AccountListItem({
     accounts: [account.id],
     period: 'lastMonth',
   });
+  const {
+    fileInputRef,
+    handleUploadClick,
+    handleFileSelected,
+    isPending: isImporting,
+    canImport,
+  } = useImportTransactions(account);
 
   return (
     <Card className="flex-row items-center border border-border py-0 ring-0">
@@ -62,6 +70,21 @@ export default function AccountListItem({
       </Link>
 
       <CardAction className="ml-auto flex shrink-0 items-center gap-1 self-center px-4">
+        {canImport && (
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={isImporting}
+            onClick={handleUploadClick}
+            aria-label={`Import transactions for ${account.name}`}
+          >
+            {isImporting ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Upload className="size-4" />
+            )}
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="icon"
@@ -79,6 +102,13 @@ export default function AccountListItem({
           <Trash2 className="size-4" />
         </Button>
       </CardAction>
+      <input
+        ref={fileInputRef}
+        hidden
+        type="file"
+        accept="text/csv"
+        onChange={handleFileSelected}
+      />
     </Card>
   );
 }
