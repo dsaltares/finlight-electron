@@ -1,9 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import type { ColumnDef } from '@tanstack/react-table';
 import { SearchX } from 'lucide-react';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { type ColumnMeta, DataTable } from '@/components/DataTable';
 import EmptyState from '@/components/EmptyState';
 import {
   type ChartConfig,
@@ -14,31 +16,29 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import useInsightsFilters from '@/hooks/useInsightsFilters';
+import useSortFromUrl from '@/hooks/useSortFromUrl';
 import { formatAmount } from '@/lib/format';
 import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
 const ACCOUNT_COLORS = [
-  '#2563EB', // Blue
-  '#16A34A', // Green
-  '#EA580C', // Orange
-  '#9333EA', // Purple
-  '#0891B2', // Cyan
-  '#DC2626', // Red
-  '#CA8A04', // Yellow
-  '#0F766E', // Teal
-  '#DB2777', // Pink
-  '#4F46E5', // Indigo
+  '#2563EB',
+  '#16A34A',
+  '#EA580C',
+  '#9333EA',
+  '#0891B2',
+  '#DC2626',
+  '#CA8A04',
+  '#0F766E',
+  '#DB2777',
+  '#4F46E5',
 ];
+
+type AccountRow = {
+  account: string;
+  amounts: Record<string, number>;
+};
 
 export default function AccountBalancesReport() {
   const trpc = useTRPC();
@@ -47,6 +47,7 @@ export default function AccountBalancesReport() {
     trpc.reports.getAccountBalancesReport.queryOptions(queryInput),
   );
   const currency = displayCurrency;
+  const { sorting, onSortingChange } = useSortFromUrl();
 
   const accountNames = useMemo(
     () => (data && data.length > 0 ? Object.keys(data[0].positions) : []),
@@ -70,6 +71,61 @@ export default function AccountBalancesReport() {
       },
     }),
     [accountNames],
+  );
+
+  const rows = useMemo<AccountRow[]>(
+    () => [
+      ...accountNames.map((name) => ({
+        account: name,
+        amounts: Object.fromEntries(
+          (data ?? []).map((d) => [d.bucket, d.positions[name] ?? 0]),
+        ),
+      })),
+      {
+        account: 'Total',
+        amounts: Object.fromEntries(
+          (data ?? []).map((d) => [d.bucket, d.total]),
+        ),
+      },
+    ],
+    [accountNames, data],
+  );
+
+  const columns = useMemo<ColumnDef<AccountRow>[]>(
+    () => [
+      {
+        accessorKey: 'account',
+        header: 'Account',
+        meta: { isSticky: true } satisfies ColumnMeta,
+        cell: ({ row }) => (
+          <span
+            className={cn(row.original.account === 'Total' && 'font-medium')}
+          >
+            {row.original.account}
+          </span>
+        ),
+      },
+      ...(data ?? []).map<ColumnDef<AccountRow>>((d) => ({
+        id: d.bucket,
+        accessorFn: (row: AccountRow) => row.amounts[d.bucket] ?? 0,
+        header: d.bucket,
+        meta: { align: 'right' } satisfies ColumnMeta,
+        cell: ({ row, getValue }) => {
+          const val = getValue<number>();
+          return (
+            <span
+              className={cn(
+                val >= 0 ? 'text-green-600' : 'text-red-600',
+                row.original.account === 'Total' && 'font-medium',
+              )}
+            >
+              {formatAmount(val, currency)}
+            </span>
+          );
+        },
+      })),
+    ],
+    [data, currency],
   );
 
   if (isLoading) {
@@ -133,49 +189,12 @@ export default function AccountBalancesReport() {
         </LineChart>
       </ChartContainer>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              {accountNames.map((name) => (
-                <TableHead key={name} className="text-right">
-                  {name}
-                </TableHead>
-              ))}
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((d) => (
-              <TableRow key={d.bucket}>
-                <TableCell>{d.bucket}</TableCell>
-                {accountNames.map((name) => (
-                  <TableCell
-                    key={name}
-                    className={cn(
-                      'text-right',
-                      (d.positions[name] ?? 0) >= 0
-                        ? 'text-green-600'
-                        : 'text-red-600',
-                    )}
-                  >
-                    {formatAmount(d.positions[name] ?? 0, currency)}
-                  </TableCell>
-                ))}
-                <TableCell
-                  className={cn(
-                    'text-right',
-                    d.total >= 0 ? 'text-green-600' : 'text-red-600',
-                  )}
-                >
-                  {formatAmount(d.total, currency)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={rows}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+      />
     </div>
   );
 }

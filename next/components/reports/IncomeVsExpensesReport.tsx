@@ -1,8 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import type { ColumnDef } from '@tanstack/react-table';
 import { SearchX } from 'lucide-react';
+import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { type ColumnMeta, DataTable } from '@/components/DataTable';
 import EmptyState from '@/components/EmptyState';
 import {
   type ChartConfig,
@@ -11,15 +14,8 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import useInsightsFilters from '@/hooks/useInsightsFilters';
+import useSortFromUrl from '@/hooks/useSortFromUrl';
 import { formatAmount } from '@/lib/format';
 import { useTRPC } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
@@ -29,6 +25,15 @@ const chartConfig: ChartConfig = {
   expenses: { label: 'Expenses', color: '#DC2626' },
 };
 
+const ROW_LABELS = ['Income', 'Expenses', 'Difference'] as const;
+const ROW_KEYS = ['income', 'expenses', 'difference'] as const;
+
+type TransposedRow = {
+  label: string;
+  key: string;
+  amounts: Record<string, number>;
+};
+
 export default function IncomeVsExpensesReport() {
   const trpc = useTRPC();
   const { queryInput, displayCurrency } = useInsightsFilters();
@@ -36,6 +41,57 @@ export default function IncomeVsExpensesReport() {
     trpc.reports.getIncomeVsExpensesReport.queryOptions(queryInput),
   );
   const currency = displayCurrency;
+  const { sorting, onSortingChange } = useSortFromUrl();
+
+  const rows = useMemo<TransposedRow[]>(
+    () =>
+      ROW_KEYS.map((key, i) => ({
+        label: ROW_LABELS[i],
+        key,
+        amounts: Object.fromEntries(
+          (data ?? []).map((d) => [d.bucket, d[key]]),
+        ),
+      })),
+    [data],
+  );
+
+  const columns = useMemo<ColumnDef<TransposedRow>[]>(
+    () => [
+      {
+        accessorKey: 'label',
+        header: '',
+        meta: { isSticky: true } satisfies ColumnMeta,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className="font-medium">{row.original.label}</span>
+        ),
+      },
+      ...(data ?? []).map<ColumnDef<TransposedRow>>((d) => ({
+        id: d.bucket,
+        accessorFn: (row: TransposedRow) => row.amounts[d.bucket] ?? 0,
+        header: d.bucket,
+        meta: { align: 'right' } satisfies ColumnMeta,
+        cell: ({ row, getValue }) => {
+          const val = getValue<number>();
+          const key = row.original.key;
+          const colorClass =
+            key === 'income'
+              ? 'text-green-700 dark:text-green-400'
+              : key === 'expenses'
+                ? 'text-red-700 dark:text-red-400'
+                : val > 0
+                  ? 'text-green-700 dark:text-green-400'
+                  : 'text-red-700 dark:text-red-400';
+          return (
+            <span className={cn(colorClass)}>
+              {formatAmount(val, currency)}
+            </span>
+          );
+        },
+      })),
+    ],
+    [data, currency],
+  );
 
   if (isLoading) {
     return (
@@ -83,41 +139,12 @@ export default function IncomeVsExpensesReport() {
         </BarChart>
       </ChartContainer>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Income</TableHead>
-              <TableHead className="text-right">Expenses</TableHead>
-              <TableHead className="text-right">Difference</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((d) => (
-              <TableRow key={d.bucket}>
-                <TableCell>{d.bucket}</TableCell>
-                <TableCell className="text-right text-green-700 dark:text-green-400">
-                  {formatAmount(d.income, currency)}
-                </TableCell>
-                <TableCell className="text-right text-red-700 dark:text-red-400">
-                  {formatAmount(d.expenses, currency)}
-                </TableCell>
-                <TableCell
-                  className={cn(
-                    'text-right',
-                    d.difference > 0
-                      ? 'text-green-700 dark:text-green-400'
-                      : 'text-red-700 dark:text-red-400',
-                  )}
-                >
-                  {formatAmount(d.difference, currency)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={rows}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+      />
     </div>
   );
 }

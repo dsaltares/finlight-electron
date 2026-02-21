@@ -11,7 +11,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useRef } from 'react';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
+import { type ReactNode, useRef, useState } from 'react';
 import {
   TableBody,
   TableCell,
@@ -19,10 +20,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
-interface ColumnMeta {
+export interface ColumnMeta {
   isHidden?: boolean;
   align?: 'left' | 'center' | 'right';
+  isSticky?: boolean;
 }
 
 const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
@@ -36,27 +39,40 @@ const getAlignmentClass = (align?: 'left' | 'center' | 'right') => {
   }
 };
 
+const getStickyClass = (isSticky?: boolean) =>
+  isSticky ? 'sticky left-0 z-10 bg-background' : '';
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  sorting: SortingState;
-  onSortingChange: OnChangeFn<SortingState>;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
   globalFilter?: string;
   virtualized?: boolean;
   rowHeightEstimate?: number;
   overscan?: number;
+  pinnedContent?: ReactNode;
+  tableClassName?: string;
+  wrapperClassName?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  sorting,
-  onSortingChange,
+  sorting: externalSorting,
+  onSortingChange: externalOnSortingChange,
   globalFilter,
   virtualized = false,
   rowHeightEstimate = 44,
   overscan = 8,
+  pinnedContent,
+  tableClassName,
+  wrapperClassName,
 }: DataTableProps<TData, TValue>) {
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const sorting = externalSorting ?? internalSorting;
+  const onSortingChange = externalOnSortingChange ?? setInternalSorting;
+
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const table = useReactTable({
     data,
@@ -86,37 +102,84 @@ export function DataTable<TData, TValue>({
         (virtualRows[virtualRows.length - 1]?.end ?? 0)
       : 0;
 
+  const renderRow = (row: (typeof rows)[number]) => (
+    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+      {row.getVisibleCells().map((cell) => {
+        const meta = cell.column.columnDef.meta as ColumnMeta | undefined;
+        if (meta?.isHidden) return null;
+        return (
+          <TableCell
+            key={cell.id}
+            className={cn(
+              getAlignmentClass(meta?.align),
+              getStickyClass(meta?.isSticky),
+            )}
+            style={{
+              width: cell.column.getSize(),
+              minWidth: cell.column.columnDef.minSize,
+              maxWidth: cell.column.columnDef.maxSize,
+            }}
+          >
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        );
+      })}
+    </TableRow>
+  );
+
   return (
     <div
       ref={tableContainerRef}
-      className="flex-1 min-h-0 border rounded-md overflow-auto relative"
+      className={cn('flex-1 min-h-0 overflow-auto relative', wrapperClassName)}
     >
-      <table className="w-full caption-bottom text-sm min-w-[800px]">
-        <TableHeader className="sticky top-0 z-10 bg-background shadow-sm after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-border">
+      <table className={cn('w-full caption-bottom text-sm', tableClassName)}>
+        <TableHeader className="sticky top-0 z-20 bg-background shadow-sm after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-border">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                if ((header.column.columnDef.meta as ColumnMeta)?.isHidden) {
-                  return null;
-                }
-                const align = (header.column.columnDef.meta as ColumnMeta)
-                  ?.align;
+                const meta = header.column.columnDef.meta as
+                  | ColumnMeta
+                  | undefined;
+                if (meta?.isHidden) return null;
+                const canSort = header.column.getCanSort();
+                const sorted = header.column.getIsSorted();
                 return (
                   <TableHead
                     key={header.id}
-                    className={getAlignmentClass(align)}
+                    className={cn(
+                      getAlignmentClass(meta?.align),
+                      getStickyClass(meta?.isSticky),
+                      canSort && 'cursor-pointer select-none',
+                    )}
                     style={{
                       width: header.getSize(),
                       minWidth: header.column.columnDef.minSize,
                       maxWidth: header.column.columnDef.maxSize,
                     }}
+                    onClick={header.column.getToggleSortingHandler()}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={cn(
+                          'flex items-center gap-1',
+                          meta?.align === 'right' && 'justify-end',
+                          meta?.align === 'center' && 'justify-center',
+                        )}
+                      >
+                        {flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
+                        {canSort &&
+                          (sorted === 'asc' ? (
+                            <ArrowUp className="size-3.5 shrink-0" />
+                          ) : sorted === 'desc' ? (
+                            <ArrowDown className="size-3.5 shrink-0" />
+                          ) : (
+                            <ChevronsUpDown className="size-3.5 shrink-0 opacity-50" />
+                          ))}
+                      </div>
+                    )}
                   </TableHead>
                 );
               })}
@@ -124,6 +187,7 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
+          {pinnedContent}
           {rows.length ? (
             virtualized ? (
               <>
@@ -138,38 +202,7 @@ export function DataTable<TData, TValue>({
                 ) : null}
                 {virtualRows.map((virtualRow) => {
                   const row = rows[virtualRow.index];
-                  return (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                    >
-                      {row.getVisibleCells().map((cell) => {
-                        if (
-                          (cell.column.columnDef.meta as ColumnMeta)?.isHidden
-                        ) {
-                          return null;
-                        }
-                        const align = (cell.column.columnDef.meta as ColumnMeta)
-                          ?.align;
-                        return (
-                          <TableCell
-                            key={cell.id}
-                            className={getAlignmentClass(align)}
-                            style={{
-                              width: cell.column.getSize(),
-                              minWidth: cell.column.columnDef.minSize,
-                              maxWidth: cell.column.columnDef.maxSize,
-                            }}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
+                  return renderRow(row);
                 })}
                 {virtualPaddingBottom > 0 ? (
                   <TableRow>
@@ -182,36 +215,7 @@ export function DataTable<TData, TValue>({
                 ) : null}
               </>
             ) : (
-              rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    if ((cell.column.columnDef.meta as ColumnMeta)?.isHidden) {
-                      return null;
-                    }
-                    const align = (cell.column.columnDef.meta as ColumnMeta)
-                      ?.align;
-                    return (
-                      <TableCell
-                        key={cell.id}
-                        className={getAlignmentClass(align)}
-                        style={{
-                          width: cell.column.getSize(),
-                          minWidth: cell.column.columnDef.minSize,
-                          maxWidth: cell.column.columnDef.maxSize,
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))
+              rows.map(renderRow)
             )
           ) : (
             <TableRow>

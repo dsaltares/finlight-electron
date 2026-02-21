@@ -1,7 +1,9 @@
 'use client';
 
+import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { type ColumnMeta, DataTable } from '@/components/DataTable';
 import { Badge } from '@/components/ui/badge';
 import {
   type ChartConfig,
@@ -9,20 +11,20 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
+import useSortFromUrl from '@/hooks/useSortFromUrl';
 import { formatAmount } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 type CategoryBucket = {
   bucket: string;
   categories: Record<string, number>;
+  total: number;
+};
+
+type CategoryRow = {
+  category: string;
+  amounts: Record<string, number>;
   total: number;
 };
 
@@ -57,6 +59,75 @@ export default function CategoryOverTimeReport({
   );
 
   const colorClass = variant === 'positive' ? 'text-green-600' : 'text-red-600';
+  const { sorting, onSortingChange } = useSortFromUrl();
+
+  const rows = useMemo<CategoryRow[]>(
+    () =>
+      categoryNames.map((name) => ({
+        category: name,
+        amounts: Object.fromEntries(
+          data.map((d) => [d.bucket, d.categories[name] ?? 0]),
+        ),
+        total: data.reduce((sum, d) => sum + (d.categories[name] ?? 0), 0),
+      })),
+    [categoryNames, data],
+  );
+
+  const columns = useMemo<ColumnDef<CategoryRow>[]>(
+    () => [
+      {
+        accessorKey: 'category',
+        header: 'Category',
+        meta: { isSticky: true } satisfies ColumnMeta,
+        cell: ({ row }) => (
+          <Badge
+            className="border-transparent text-white"
+            style={{ backgroundColor: colorMap[row.original.category] }}
+          >
+            {row.original.category}
+          </Badge>
+        ),
+      },
+      ...data.map<ColumnDef<CategoryRow>>((d) => ({
+        id: d.bucket,
+        accessorFn: (row: CategoryRow) => row.amounts[d.bucket] ?? 0,
+        header: d.bucket,
+        meta: { align: 'right' } satisfies ColumnMeta,
+        cell: ({ getValue }) => (
+          <span className={colorClass}>
+            {formatAmount(getValue<number>(), currency)}
+          </span>
+        ),
+      })),
+      {
+        accessorKey: 'total',
+        header: 'Total',
+        meta: { align: 'right' } satisfies ColumnMeta,
+        cell: ({ row }) => (
+          <span className={cn(colorClass, 'font-medium')}>
+            {formatAmount(row.original.total, currency)}
+          </span>
+        ),
+      },
+    ],
+    [data, colorMap, colorClass, currency],
+  );
+
+  const grandTotal = data.reduce((sum, d) => sum + d.total, 0);
+
+  const pinnedContent = (
+    <TableRow className="font-medium">
+      <TableCell className="sticky left-0 z-10 bg-background">Total</TableCell>
+      {data.map((d) => (
+        <TableCell key={d.bucket} className={cn('text-right', colorClass)}>
+          {formatAmount(d.total, currency)}
+        </TableCell>
+      ))}
+      <TableCell className={cn('text-right', colorClass)}>
+        {formatAmount(grandTotal, currency)}
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -100,44 +171,13 @@ export default function CategoryOverTimeReport({
         </BarChart>
       </ChartContainer>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              {categoryNames.map((name) => (
-                <TableHead key={name} className="text-right">
-                  <Badge
-                    className="border-transparent text-white"
-                    style={{ backgroundColor: colorMap[name] }}
-                  >
-                    {name}
-                  </Badge>
-                </TableHead>
-              ))}
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((d) => (
-              <TableRow key={d.bucket}>
-                <TableCell>{d.bucket}</TableCell>
-                {categoryNames.map((name) => (
-                  <TableCell
-                    key={name}
-                    className={cn('text-right', colorClass)}
-                  >
-                    {formatAmount(d.categories[name] ?? 0, currency)}
-                  </TableCell>
-                ))}
-                <TableCell className={cn('text-right', colorClass)}>
-                  {formatAmount(d.total, currency)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={rows}
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+        pinnedContent={pinnedContent}
+      />
     </div>
   );
 }

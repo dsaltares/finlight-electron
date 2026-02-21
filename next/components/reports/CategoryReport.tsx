@@ -1,6 +1,9 @@
 'use client';
 
+import type { ColumnDef } from '@tanstack/react-table';
+import { useMemo } from 'react';
 import { Cell, Pie, PieChart } from 'recharts';
+import { type ColumnMeta, DataTable } from '@/components/DataTable';
 import { Badge } from '@/components/ui/badge';
 import {
   type ChartConfig,
@@ -8,14 +11,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/ui/table';
+import useSortFromUrl from '@/hooks/useSortFromUrl';
 import { formatAmount } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +42,44 @@ export default function CategoryReport({
     ]),
   );
   const colorClass = variant === 'positive' ? 'text-green-600' : 'text-red-600';
+  const { sorting, onSortingChange } = useSortFromUrl();
+
+  const columns = useMemo<ColumnDef<CategoryAggregate>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Category',
+        cell: ({ row }) => (
+          <Badge
+            className="border-transparent text-white"
+            style={{ backgroundColor: colorMap[row.original.name] }}
+          >
+            {row.original.name}
+          </Badge>
+        ),
+      },
+      {
+        accessorKey: 'value',
+        header: 'Amount',
+        meta: { align: 'right' } satisfies ColumnMeta,
+        cell: ({ row }) => (
+          <span className={colorClass}>
+            {formatAmount(row.original.value, currency)}
+          </span>
+        ),
+      },
+    ],
+    [colorMap, colorClass, currency],
+  );
+
+  const pinnedContent = (
+    <TableRow className="font-medium">
+      <TableCell>Total</TableCell>
+      <TableCell className={cn('text-right', colorClass)}>
+        {formatAmount(data.total, currency)}
+      </TableCell>
+    </TableRow>
+  );
 
   return (
     <div className="flex h-full flex-col items-start gap-4 lg:flex-row lg:items-stretch">
@@ -95,42 +130,14 @@ export default function CategoryReport({
         </PieChart>
       </ChartContainer>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="sticky top-0 bg-background">
-                Category
-              </TableHead>
-              <TableHead className="sticky top-0 bg-background text-right">
-                Amount
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow className="font-medium">
-              <TableCell>Total</TableCell>
-              <TableCell className={cn('text-right', colorClass)}>
-                {formatAmount(data.total, currency)}
-              </TableCell>
-            </TableRow>
-            {data.categories.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell>
-                  <Badge
-                    className="border-transparent text-white"
-                    style={{ backgroundColor: colorMap[c.name] }}
-                  >
-                    {c.name}
-                  </Badge>
-                </TableCell>
-                <TableCell className={cn('text-right', colorClass)}>
-                  {formatAmount(c.value, currency)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="min-h-0 flex-1">
+        <DataTable
+          columns={columns}
+          data={data.categories}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+          pinnedContent={pinnedContent}
+        />
       </div>
     </div>
   );
