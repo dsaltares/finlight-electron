@@ -103,7 +103,14 @@ function parseArrayField<T>(
 }
 
 function toCents(value: number): number {
-  return Math.round(value * 100);
+  const [whole = '0', frac = ''] = value.toString().split('.');
+  const sign = value < 0 ? -1 : 1;
+  const absWhole = whole.replace('-', '');
+  const d1 = Number(frac[0] ?? 0);
+  const d2 = Number(frac[1] ?? 0);
+  const d3 = Number(frac[2] ?? 0);
+  const cents = Number(absWhole) * 100 + d1 * 10 + d2;
+  return sign * (d3 >= 5 ? cents + 1 : cents);
 }
 
 function toDateOnly(value: string): string {
@@ -387,6 +394,30 @@ async function run() {
 
       if (budgetEntryRows.length > 0) {
         await trx.insertInto('budget_entry').values(budgetEntryRows).execute();
+      }
+
+      for (const [, newAccountId] of accountIdMap) {
+        const account = await trx
+          .selectFrom('bank_account')
+          .select('initialBalance')
+          .where('id', '=', newAccountId)
+          .executeTakeFirstOrThrow();
+        const transactions = await trx
+          .selectFrom('account_transaction')
+          .select('amount')
+          .where('accountId', '=', newAccountId)
+          .where('deletedAt', 'is', null)
+          .execute();
+        await trx
+          .updateTable('bank_account')
+          .set({
+            balance: transactions.reduce(
+              (sum, t) => sum + t.amount,
+              account.initialBalance,
+            ),
+          })
+          .where('id', '=', newAccountId)
+          .execute();
       }
 
       logger.info(
