@@ -16,8 +16,8 @@ import BulkEditTransactionsDialog from '@/components/BulkEditTransactionsDialog'
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 import CreateUpdateTransactionDialog from '@/components/CreateUpdateTransactionDialog';
 import EmptyState from '@/components/EmptyState';
-import TransactionFilterDialog from '@/components/TransactionFilterDialog';
 import TransactionFilterChips from '@/components/TransactionFilterChips';
+import TransactionFilterDialog from '@/components/TransactionFilterDialog';
 import TransactionTable from '@/components/TransactionTable';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,14 +67,20 @@ export default function TransactionsPage() {
     }),
   );
 
-  const { mutateAsync: deleteTransaction, isPending: isBulkDeleting } =
+  const { mutate: deleteManyTransactions, isPending: isBulkDeleting } =
     useMutation(
-      trpc.transactions.delete.mutationOptions({
+      trpc.transactions.deleteMany.mutationOptions({
+        onSuccess: (count) => {
+          toast.success(
+            `${count} transaction${count === 1 ? '' : 's'} deleted.`,
+          );
+          setRowSelection({});
+        },
         onError: (error) => {
           toast.error(
             error.message
-              ? `Failed to delete transaction. ${error.message}`
-              : 'Failed to delete transaction.',
+              ? `Failed to delete transactions. ${error.message}`
+              : 'Failed to delete transactions.',
           );
         },
       }),
@@ -108,11 +114,7 @@ export default function TransactionsPage() {
   const selectedCount = selectedIds.length;
 
   const handleBulkDelete = async () => {
-    await Promise.all(selectedIds.map((id) => deleteTransaction({ id })));
-    setRowSelection({});
-    toast.success(
-      `${selectedIds.length} transaction${selectedIds.length === 1 ? '' : 's'} deleted.`,
-    );
+    deleteManyTransactions({ ids: selectedIds });
   };
 
   const {

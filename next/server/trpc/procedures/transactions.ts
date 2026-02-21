@@ -314,6 +314,44 @@ const deleteTransaction = authedProcedure
     await updateAccountBalance(existing.accountId);
   });
 
+const deleteManyTransactions = authedProcedure
+  .input(z.object({ ids: z.number().array().min(1) }))
+  .output(z.number())
+  .mutation(async ({ ctx, input: { ids } }) => {
+    const userId = ctx.user?.id;
+    if (!userId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    const owned = await db
+      .selectFrom('account_transaction')
+      .select(['account_transaction.id', 'account_transaction.accountId'])
+      .innerJoin(
+        'bank_account',
+        'account_transaction.accountId',
+        'bank_account.id',
+      )
+      .where('bank_account.userId', '=', userId)
+      .where('account_transaction.id', 'in', ids)
+      .where('account_transaction.deletedAt', 'is', null)
+      .execute();
+    if (owned.length !== ids.length) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'One or more transactions not found',
+      });
+    }
+    await db
+      .updateTable('account_transaction')
+      .set({ deletedAt: new Date().toISOString() })
+      .where('id', 'in', ids)
+      .execute();
+    const affectedAccountIds = [...new Set(owned.map((row) => row.accountId))];
+    await Promise.all(
+      affectedAccountIds.map((accountId) => updateAccountBalance(accountId)),
+    );
+    return owned.length;
+  });
+
 export default {
   list: listTransactions,
   create: createTransaction,
@@ -321,4 +359,5 @@ export default {
   update: updateTransaction,
   updateMany: updateManyTransactions,
   delete: deleteTransaction,
+  deleteMany: deleteManyTransactions,
 };
