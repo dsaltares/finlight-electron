@@ -44,7 +44,7 @@ function convertAmount(
   return Math.round((amountInCents * eurToTarget) / eurToSource);
 }
 
-async function ensureBudgetExists(userId: string) {
+export async function ensureBudgetExists(userId: string) {
   const budgetQuery = db
     .selectFrom('budget')
     .selectAll()
@@ -75,7 +75,7 @@ async function ensureBudgetExists(userId: string) {
   return budgetQuery.executeTakeFirstOrThrow();
 }
 
-function granularityToMonthly(granularity: string) {
+export function granularityToMonthly(granularity: string) {
   switch (granularity) {
     case 'Yearly':
       return 1 / 12;
@@ -86,7 +86,7 @@ function granularityToMonthly(granularity: string) {
   }
 }
 
-function monthlyToGranularity(granularity: string) {
+export function monthlyToGranularity(granularity: string) {
   switch (granularity) {
     case 'Yearly':
       return 12.0;

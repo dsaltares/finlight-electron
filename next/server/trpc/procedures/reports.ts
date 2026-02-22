@@ -8,6 +8,11 @@ import { parse } from 'date-fns/parse';
 import groupBy from 'lodash/groupBy';
 import z from 'zod';
 import { db } from '@/server/db';
+import {
+  ensureBudgetExists,
+  granularityToMonthly,
+  monthlyToGranularity,
+} from '@/server/trpc/procedures/budget';
 import { getDateWhereFromFilter } from '@/server/trpc/procedures/dateUtils';
 import {
   DateFilterSchema,
@@ -515,10 +520,112 @@ function getEmptyForecastBuckets(
   }));
 }
 
+const getBudgetOverTimeReport = authedProcedure
+  .input(
+    z.object({
+      type: TransactionTypeSchema,
+      date: DateFilterSchema.optional(),
+      accounts: z.number().array().optional(),
+      categories: z.number().array().optional(),
+      currency: z.string().optional(),
+      granularity: TimeGranularitySchema.optional().default('Monthly'),
+      timeZone: z.string().optional(),
+    }),
+  )
+  .output(
+    z.array(
+      z.object({
+        bucket: z.string(),
+        categories: z.record(z.string(), z.number()),
+        budgetCategories: z.record(z.string(), z.number()),
+        total: z.number(),
+        budgetTarget: z.number(),
+      }),
+    ),
+  )
+  .query(async ({ ctx, input }) => {
+    if (!ctx.user?.id) throw new TRPCError({ code: 'UNAUTHORIZED' });
+    const currency = await resolveTargetCurrency(input.currency, ctx.user.id);
+
+    const [transactions, budget, categories] = await Promise.all([
+      getTransactions(ctx.user.id, input),
+      ensureBudgetExists(ctx.user.id),
+      db
+        .selectFrom('category')
+        .select(['id', 'name'])
+        .where('userId', '=', ctx.user.id)
+        .where('deletedAt', 'is', null)
+        .execute(),
+    ]);
+
+    const rates = await getRates([
+      ...new Set([...transactions.map((t) => t.accountCurrency), currency]),
+    ]);
+
+    const categoriesById = Object.fromEntries(
+      categories.map((c) => [c.id, c.name]),
+    );
+
+    const dateFormat = getFormatForGranularity(input.granularity);
+    const displayFormat = getDisplayFormatForGranularity(input.granularity);
+
+    const multiplier =
+      granularityToMonthly(budget.granularity) *
+      monthlyToGranularity(input.granularity);
+
+    const categorySet =
+      input.categories && input.categories.length > 0
+        ? new Set(input.categories)
+        : null;
+
+    const budgetCategories: Record<string, number> = {};
+    let budgetTarget = 0;
+    for (const entry of budget.entries) {
+      if (entry.type !== input.type) continue;
+      if (categorySet && !categorySet.has(entry.categoryId)) continue;
+      const name = categoriesById[entry.categoryId] ?? 'Unknown';
+      const target = Math.round(
+        convertAmount(entry.target, 'EUR', currency, rates) * multiplier,
+      );
+      budgetCategories[name] = (budgetCategories[name] ?? 0) + target;
+      budgetTarget += target;
+    }
+
+    const buckets = groupBy(transactions, (t) => format(t.date, dateFormat));
+
+    return Object.keys(buckets)
+      .sort()
+      .map((key) => {
+        const byCat = groupBy(buckets[key], (t) => t.categoryId ?? 'unknown');
+        const cats = Object.values(byCat).map((txns) => ({
+          name:
+            (txns[0].categoryId
+              ? categoriesById[txns[0].categoryId]
+              : undefined) ?? 'Unknown',
+          value: Math.abs(
+            txns.reduce(
+              (sum, t) =>
+                sum +
+                convertAmount(t.amount, t.accountCurrency, currency, rates),
+              0,
+            ),
+          ),
+        }));
+        return {
+          bucket: format(parse(key, dateFormat, new Date()), displayFormat),
+          categories: Object.fromEntries(cats.map((c) => [c.name, c.value])),
+          budgetCategories,
+          total: cats.reduce((sum, c) => sum + c.value, 0),
+          budgetTarget,
+        };
+      });
+  });
+
 export default {
   getCategoryReport,
   getBucketedCategoryReport,
   getIncomeVsExpensesReport,
   getAccountBalancesReport,
   getBalanceForecastReport,
+  getBudgetOverTimeReport,
 };

@@ -8,6 +8,8 @@ import CategorizedExpensesOverTimeReport from '@/components/reports/CategorizedE
 import CategorizedExpensesReport from '@/components/reports/CategorizedExpensesReport';
 import CategorizedIncomeOverTimeReport from '@/components/reports/CategorizedIncomeOverTimeReport';
 import CategorizedIncomeReport from '@/components/reports/CategorizedIncomeReport';
+import ExpensesVsBudgetReport from '@/components/reports/ExpensesVsBudgetReport';
+import IncomeVsBudgetReport from '@/components/reports/IncomeVsBudgetReport';
 import IncomeVsExpensesReport from '@/components/reports/IncomeVsExpensesReport';
 import ReportSettingsChips from '@/components/reports/ReportSettingsChips';
 import ReportSettingsDialog from '@/components/reports/ReportSettingsDialog';
@@ -39,6 +41,14 @@ const Reports = {
   categorizedIncomeOverTime: {
     name: 'Where the money comes from over time',
     Component: CategorizedIncomeOverTimeReport,
+  },
+  expensesVsBudget: {
+    name: 'Expenses vs budget over time',
+    Component: ExpensesVsBudgetReport,
+  },
+  incomeVsBudget: {
+    name: 'Income vs budget over time',
+    Component: IncomeVsBudgetReport,
   },
   incomeVsExpenses: {
     name: 'Income vs Expenses',
