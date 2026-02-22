@@ -29,7 +29,11 @@ const chartConfig: ChartConfig = {
   forecast: { label: 'Forecast', color: 'var(--color-muted-foreground)' },
 };
 
-export default function BalanceForecastReport() {
+export default function BalanceForecastReport({
+  compact,
+}: {
+  compact?: boolean;
+} = {}) {
   const trpc = useTRPC();
   const { queryInput, displayCurrency } = useInsightsFilters();
   const { data, isLoading } = useQuery(
@@ -49,11 +53,14 @@ export default function BalanceForecastReport() {
   }
 
   return (
-    <ChartContainer config={chartConfig} className="h-96 w-full">
+    <ChartContainer
+      config={chartConfig}
+      className={compact ? 'h-48 w-full' : 'h-96 w-full'}
+    >
       <ComposedChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="bucket" />
-        <YAxis />
+        {!compact && <XAxis dataKey="bucket" />}
+        {!compact && <YAxis />}
         <ChartTooltip
           content={
             <ChartTooltipContent
@@ -77,7 +84,7 @@ export default function BalanceForecastReport() {
             />
           }
         />
-        <ChartLegend content={<ChartLegendContent />} />
+        {!compact && <ChartLegend content={<ChartLegendContent />} />}
         <Area
           dataKey="forecast"
           name="forecast"

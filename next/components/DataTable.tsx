@@ -134,7 +134,10 @@ export function DataTable<TData, TValue>({
   return (
     <div
       ref={tableContainerRef}
-      className={cn('flex-1 min-h-0 overflow-auto relative z-0', wrapperClassName)}
+      className={cn(
+        'flex-1 min-h-0 overflow-auto relative z-0',
+        wrapperClassName,
+      )}
     >
       <table className={cn('w-full caption-bottom text-sm', tableClassName)}>
         <TableHeader className="sticky top-0 z-20 bg-background shadow-sm after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-border">

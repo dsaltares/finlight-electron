@@ -41,7 +41,9 @@ export default function BudgetOptionsDialog({ open, onClose }: Props) {
   } = useBudgetFilters();
 
   const [date, setDate] = useState(selectedDate);
-  const [granularity, setGranularity] = useState(queryInput.granularity as string);
+  const [granularity, setGranularity] = useState(
+    queryInput.granularity as string,
+  );
   const [currency, setCurrency] = useState<ComboboxOption>(
     currencyOptionsById[filters.currency ?? displayCurrency] ??
       currencyOptionsById.EUR,

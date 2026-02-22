@@ -9,7 +9,11 @@ import { Spinner } from '@/components/ui/spinner';
 import useInsightsFilters from '@/hooks/useInsightsFilters';
 import { useTRPC } from '@/lib/trpc';
 
-export default function CategorizedExpensesReport() {
+export default function CategorizedExpensesReport({
+  compact,
+}: {
+  compact?: boolean;
+} = {}) {
   const trpc = useTRPC();
   const { queryInput, displayCurrency } = useInsightsFilters();
   const { data, isLoading } = useQuery(
@@ -41,6 +45,7 @@ export default function CategorizedExpensesReport() {
       variant="negative"
       currency={displayCurrency}
       colorMap={colorMap}
+      compact={compact}
     />
   );
 }

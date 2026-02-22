@@ -40,7 +40,11 @@ type AccountRow = {
   amounts: Record<string, number>;
 };
 
-export default function AccountBalancesReport() {
+export default function AccountBalancesReport({
+  compact,
+}: {
+  compact?: boolean;
+} = {}) {
   const trpc = useTRPC();
   const { queryInput, displayCurrency } = useInsightsFilters();
   const { data, isLoading } = useQuery(
@@ -141,11 +145,14 @@ export default function AccountBalancesReport() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ChartContainer config={config} className="h-96 w-full">
+      <ChartContainer
+        config={config}
+        className={compact ? 'h-48 w-full' : 'h-96 w-full'}
+      >
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="bucket" />
-          <YAxis />
+          {!compact && <XAxis dataKey="bucket" />}
+          {!compact && <YAxis />}
           <ChartTooltip
             content={
               <ChartTooltipContent
@@ -169,7 +176,7 @@ export default function AccountBalancesReport() {
               />
             }
           />
-          <ChartLegend content={<ChartLegendContent />} />
+          {!compact && <ChartLegend content={<ChartLegendContent />} />}
           {accountNames.map((name, i) => (
             <Line
               key={name}
@@ -189,12 +196,14 @@ export default function AccountBalancesReport() {
         </LineChart>
       </ChartContainer>
 
-      <DataTable
-        columns={columns}
-        data={rows}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-      />
+      {!compact && (
+        <DataTable
+          columns={columns}
+          data={rows}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+        />
+      )}
     </div>
   );
 }

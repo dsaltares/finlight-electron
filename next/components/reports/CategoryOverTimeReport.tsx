@@ -33,6 +33,7 @@ type Props = {
   currency: string;
   variant?: 'positive' | 'negative';
   colorMap: Record<string, string>;
+  compact?: boolean;
 };
 
 export default function CategoryOverTimeReport({
@@ -40,6 +41,7 @@ export default function CategoryOverTimeReport({
   currency,
   variant = 'negative',
   colorMap,
+  compact,
 }: Props) {
   const categoryNames = useMemo(() => {
     const names = new Set<string>();
@@ -131,11 +133,14 @@ export default function CategoryOverTimeReport({
 
   return (
     <div className="flex flex-col gap-4">
-      <ChartContainer config={config} className="h-96 w-full">
+      <ChartContainer
+        config={config}
+        className={compact ? 'h-48 w-full' : 'h-96 w-full'}
+      >
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="bucket" />
-          <YAxis />
+          {!compact && <XAxis dataKey="bucket" />}
+          {!compact && <YAxis />}
           <ChartTooltip
             content={
               <ChartTooltipContent
@@ -171,13 +176,15 @@ export default function CategoryOverTimeReport({
         </BarChart>
       </ChartContainer>
 
-      <DataTable
-        columns={columns}
-        data={rows}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-        pinnedContent={pinnedContent}
-      />
+      {!compact && (
+        <DataTable
+          columns={columns}
+          data={rows}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+          pinnedContent={pinnedContent}
+        />
+      )}
     </div>
   );
 }

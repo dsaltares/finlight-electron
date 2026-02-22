@@ -34,7 +34,11 @@ type TransposedRow = {
   amounts: Record<string, number>;
 };
 
-export default function IncomeVsExpensesReport() {
+export default function IncomeVsExpensesReport({
+  compact,
+}: {
+  compact?: boolean;
+} = {}) {
   const trpc = useTRPC();
   const { queryInput, displayCurrency } = useInsightsFilters();
   const { data, isLoading } = useQuery(
@@ -106,11 +110,14 @@ export default function IncomeVsExpensesReport() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ChartContainer config={chartConfig} className="h-96 w-full">
+      <ChartContainer
+        config={chartConfig}
+        className={compact ? 'h-48 w-full' : 'h-96 w-full'}
+      >
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="bucket" />
-          <YAxis />
+          {!compact && <XAxis dataKey="bucket" />}
+          {!compact && <YAxis />}
           <ChartTooltip
             content={
               <ChartTooltipContent
@@ -139,12 +146,14 @@ export default function IncomeVsExpensesReport() {
         </BarChart>
       </ChartContainer>
 
-      <DataTable
-        columns={columns}
-        data={rows}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-      />
+      {!compact && (
+        <DataTable
+          columns={columns}
+          data={rows}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+        />
+      )}
     </div>
   );
 }

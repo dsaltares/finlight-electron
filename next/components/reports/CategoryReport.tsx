@@ -27,6 +27,7 @@ type Props = {
   variant?: 'positive' | 'negative';
   currency: string;
   colorMap: Record<string, string>;
+  compact?: boolean;
 };
 
 export default function CategoryReport({
@@ -34,6 +35,7 @@ export default function CategoryReport({
   variant = 'negative',
   currency,
   colorMap,
+  compact,
 }: Props) {
   const config: ChartConfig = Object.fromEntries(
     data.categories.map((c) => [
@@ -81,55 +83,64 @@ export default function CategoryReport({
     </TableRow>
   );
 
+  const chart = (
+    <ChartContainer
+      config={config}
+      className={
+        compact
+          ? 'h-48 w-full'
+          : 'mx-auto aspect-square h-80 shrink-0 lg:mx-0 lg:flex-1'
+      }
+    >
+      <PieChart>
+        <ChartTooltip
+          content={
+            <ChartTooltipContent
+              nameKey="name"
+              formatter={(value, _name, item) => (
+                <>
+                  <div
+                    className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                    style={{
+                      backgroundColor:
+                        item.payload?.fill || item.color || undefined,
+                    }}
+                  />
+                  <div className="flex flex-1 items-center justify-between gap-4">
+                    <span className="text-muted-foreground">{item.name}</span>
+                    <span className="text-foreground font-mono font-medium tabular-nums">
+                      {formatAmount(value as number, currency)}
+                    </span>
+                  </div>
+                </>
+              )}
+            />
+          }
+        />
+        <Pie
+          data={data.categories}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius="70%"
+        >
+          {data.categories.map((entry) => (
+            <Cell
+              key={entry.id}
+              fill={colorMap[entry.name] ?? 'var(--color-chart-1)'}
+            />
+          ))}
+        </Pie>
+      </PieChart>
+    </ChartContainer>
+  );
+
+  if (compact) return chart;
+
   return (
     <div className="flex h-full flex-col items-start gap-4 lg:flex-row lg:items-stretch">
-      <ChartContainer
-        config={config}
-        className="mx-auto aspect-square h-80 shrink-0 lg:mx-0 lg:flex-1"
-      >
-        <PieChart>
-          <ChartTooltip
-            content={
-              <ChartTooltipContent
-                nameKey="name"
-                formatter={(value, _name, item) => (
-                  <>
-                    <div
-                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                      style={{
-                        backgroundColor:
-                          item.payload?.fill || item.color || undefined,
-                      }}
-                    />
-                    <div className="flex flex-1 items-center justify-between gap-4">
-                      <span className="text-muted-foreground">{item.name}</span>
-                      <span className="text-foreground font-mono font-medium tabular-nums">
-                        {formatAmount(value as number, currency)}
-                      </span>
-                    </div>
-                  </>
-                )}
-              />
-            }
-          />
-          <Pie
-            data={data.categories}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius="70%"
-          >
-            {data.categories.map((entry) => (
-              <Cell
-                key={entry.id}
-                fill={colorMap[entry.name] ?? 'var(--color-chart-1)'}
-              />
-            ))}
-          </Pie>
-        </PieChart>
-      </ChartContainer>
-
+      {chart}
       <div className="min-h-0 flex-1">
         <DataTable
           columns={columns}

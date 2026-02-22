@@ -42,6 +42,7 @@ type Props = {
   currency: string;
   variant?: 'positive' | 'negative';
   colorMap: Record<string, string>;
+  compact?: boolean;
 };
 
 function getTrackingColor(
@@ -61,6 +62,7 @@ export default function BudgetOverTimeSection({
   currency,
   variant = 'negative',
   colorMap,
+  compact,
 }: Props) {
   const categoryNames = useMemo(() => {
     const names = new Set<string>();
@@ -227,11 +229,17 @@ export default function BudgetOverTimeSection({
 
   return (
     <div className="flex flex-col gap-4">
-      <ChartContainer config={config} className="relative z-30 h-96 w-full">
+      <ChartContainer
+        config={config}
+        className={cn(
+          'relative z-30 w-full',
+          compact ? 'h-48' : 'h-96',
+        )}
+      >
         <ComposedChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="bucket" />
-          <YAxis />
+          {!compact && <XAxis dataKey="bucket" />}
+          {!compact && <YAxis />}
           <ChartTooltip
             content={
               <ChartTooltipContent
@@ -289,13 +297,15 @@ export default function BudgetOverTimeSection({
         </ComposedChart>
       </ChartContainer>
 
-      <DataTable
-        columns={columns}
-        data={rows}
-        sorting={sorting}
-        onSortingChange={onSortingChange}
-        pinnedContent={pinnedContent}
-      />
+      {!compact && (
+        <DataTable
+          columns={columns}
+          data={rows}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+          pinnedContent={pinnedContent}
+        />
+      )}
     </div>
   );
 }
