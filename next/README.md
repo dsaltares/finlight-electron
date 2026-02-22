@@ -12,6 +12,14 @@ Self-hosted personal finance tracker. Manage accounts, categorize transactions, 
 - 💱 **Exchange rates** — automatic currency conversion
 - 🔐 **Auth** — Google OAuth via Better Auth
 
+## 📸 Screenshots
+
+| | |
+|---|---|
+| ![Accounts](screenshots/accounts.png) | ![Transactions](screenshots/transactions.png) |
+| ![Categories](screenshots/categories.png) | ![Budget](screenshots/budget.png) |
+| ![Insights](screenshots/insights.png) | ![Exchange Rates](screenshots/exchange-rates.png) |
+
 ## 🛠️ Tech Stack
 
 - ⚡ **Next.js 16** — App Router, React 19, TypeScript
